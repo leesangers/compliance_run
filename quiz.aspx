@@ -1,549 +1,518 @@
-﻿<%@ Page Language="C#" %>
-    <!DOCTYPE html>
-    <html lang="ko">
+<%@ Page Language="C#" %>
+<!DOCTYPE html>
+<html lang="ko">
 
-    <head>
-        <meta name="WebPartPageExpansion" content="full" />
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bobcat Sanctions Run - 국제 제재 OX 퀴즈</title>
-        <style>
-            :root {
-                --primary-color: #000000;
-                --accent-color: #F15A22;
-                --bg-sky: #87CEEB;
-                --bg-ground: #8B4513;
-                --color-o: #2196F3;
-                --color-x: #F44336;
-            }
+<head>
+    <meta name="WebPartPageExpansion" content="full" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobcat Compliance Run - 하도급법 OX 퀴즈</title>
+    <style>
+        :root {
+            --famicom-red: #A01010;
+            --famicom-gold: #FFD700;
+            --famicom-cream: #E8E0D0;
+            --famicom-black: #000000;
+            --color-o: #2196F3;
+            --color-x: #F44336;
+        }
 
-            body {
-                font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-                background-color: #333;
-                color: #333;
-                margin: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                overflow: hidden;
-            }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: transparent;
+            color: var(--famicom-black);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            image-rendering: pixelated;
+        }
 
-            #game-container {
-                position: relative;
-                width: 800px;
-                max-width: 95vw;
-                height: 400px;
-                background: linear-gradient(#87CEEB 0%, #E0F6FF 80%);
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-                overflow: hidden;
-                pointer-events: auto;
-            }
+        #game-container {
+            position: relative;
+            width: 800px;
+            max-width: 100%;
+            height: 400px;
+            background-color: var(--famicom-cream);
+            /* Pixelated border using box-shadow */
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                8px 8px 0px 0px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            pointer-events: auto;
+            margin: 10px auto;
+        }
 
-            @media (max-width: 800px) {
-                #game-container {
-                    height: 350px;
-                }
+        /* Sharper scanline and pixel grid effect */
+        #game-container::after {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.03), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 4px 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
 
-                #hud {
-                    font-size: 1.2em;
-                }
+        @media (max-width: 800px) {
+            #game-container { height: 350px; }
+            #hud { font-size: 1em; }
+            #question-text { font-size: 1em; }
+            .ox-btn { font-size: 1.5em; padding: 10px; }
+            #player, #goal-flag { font-size: 2.5em; }
+            .enemy { font-size: 2em; }
+        }
 
-                #question-text {
-                    font-size: 1.2em;
-                }
+        #hud {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.25em;
+            font-weight: bold;
+            z-index: 10;
+            text-transform: uppercase;
+        }
 
-                .ox-btn {
-                    font-size: 2em;
-                    padding: 10px;
-                }
+        .hearts { color: var(--famicom-red); }
 
-                #player,
-                #goal-flag {
-                    font-size: 3em;
-                }
+        #ground {
+            position: absolute;
+            bottom: 0;
+            width: 200%;
+            height: 60px;
+            background-color: #5D4037;
+            border-top: 4px solid var(--famicom-black);
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 46px, var(--famicom-black) 46px, var(--famicom-black) 50px);
+            animation: scrollGround 1s steps(8) infinite;
+        }
 
-                .enemy {
-                    font-size: 2.5em;
-                }
-            }
+        @keyframes scrollGround {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50px); }
+        }
 
-            #hud {
-                position: absolute;
-                top: 20px;
-                left: 20px;
-                right: 20px;
-                display: flex;
-                justify-content: space-between;
-                font-size: 1.5em;
-                font-weight: bold;
-                z-index: 10;
-            }
+        #player {
+            position: absolute;
+            bottom: 60px;
+            left: 50px;
+            font-size: 4em;
+            animation: runStep 0.4s steps(2) infinite;
+            z-index: 5;
+        }
 
-            .hearts {
-                color: red;
-            }
+        @keyframes runStep {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
 
-            .progress-text {
-                color: var(--primary-color);
-            }
+        #player.walking {
+            animation: none;
+            transition: left 2s steps(20) linear;
+        }
 
-            #ground {
-                position: absolute;
-                bottom: 0;
-                width: 200%;
-                height: 60px;
-                background: repeating-linear-gradient(90deg, #5D4037, #5D4037 50px, #795548 50px, #795548 100px);
-                animation: scrollGround 2s linear infinite;
-            }
+        #goal-flag {
+            position: absolute;
+            bottom: 60px;
+            right: 50px;
+            font-size: 4em;
+            display: none;
+            z-index: 4;
+        }
 
-            @keyframes scrollGround {
-                from {
-                    transform: translateX(0);
-                }
+        .enemy {
+            position: absolute;
+            bottom: 60px;
+            right: -100px;
+            font-size: 3.5em;
+            z-index: 4;
+        }
 
-                to {
-                    transform: translateX(-100px);
-                }
-            }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--famicom-cream);
+            z-index: 20;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-            #player {
-                position: absolute;
-                bottom: 60px;
-                left: 50px;
-                font-size: 4em;
-                animation: runBounce 0.4s infinite alternate ease-in-out;
-                z-index: 5;
-                filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
-            }
+        .hidden { display: none !important; }
 
-            @keyframes runBounce {
-                from {
-                    transform: translateY(0);
-                }
+        h1 {
+            margin: 0 0 20px 0;
+            color: var(--famicom-gold);
+            font-size: 2.5em;
+            text-shadow: 4px 4px 0px var(--famicom-red);
+            letter-spacing: -2px;
+        }
 
-                to {
-                    transform: translateY(-15px);
-                }
-            }
+        p {
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
 
-            #player.walking {
-                animation: none;
-                transition: left 2.5s linear;
-            }
+        button {
+            background-color: var(--famicom-red);
+            color: var(--famicom-cream);
+            /* Pixel border */
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                4px 4px 0px 0px var(--famicom-black);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: inherit;
+            margin: 6px;
+        }
 
-            #goal-flag {
-                position: absolute;
-                bottom: 60px;
-                right: 50px;
-                font-size: 4em;
-                display: none;
-                z-index: 4;
-                filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
-            }
+        button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                6px 6px 0px 0px var(--famicom-black);
+            background-color: #c01010;
+        }
 
-            .enemy {
-                position: absolute;
-                bottom: 60px;
-                right: -100px;
-                font-size: 3.5em;
-                z-index: 4;
-                filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.5));
-            }
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--famicom-black);
+        }
 
-            .overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.85);
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                color: white;
-                z-index: 20;
-                text-align: center;
-            }
+        #quiz-modal {
+            background: var(--famicom-cream);
+            /* Pixel border */
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                8px 8px 0px 0px var(--famicom-black);
+            color: var(--famicom-black);
+            padding: 30px;
+            width: 85%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-            .hidden {
-                display: none !important;
-            }
+        #question-text {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
 
-            h1 {
-                margin: 0 0 20px 0;
-                color: var(--accent-color);
-                font-size: 2.5em;
-            }
+        .ox-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
 
-            p {
-                font-size: 1.2em;
-                line-height: 1.6;
-                margin-bottom: 30px;
-            }
+        .ox-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 2.5em;
+            font-weight: bold;
+            border: 4px solid var(--famicom-black);
+            color: white;
+            box-shadow: 4px 4px 0px var(--famicom-black);
+        }
 
-            button {
-                background-color: var(--accent-color);
-                color: white;
-                border: none;
-                padding: 15px 40px;
-                font-size: 1.2em;
-                font-weight: bold;
-                border-radius: 50px;
-                cursor: pointer;
-                transition: transform 0.2s;
-                box-shadow: 0 5px 15px rgba(241, 90, 34, 0.4);
-                position: relative;
-                z-index: 25;
-            }
+        .btn-o { background-color: var(--color-o); }
+        .btn-x { background-color: var(--color-x); }
 
-            button:hover {
-                transform: scale(1.05);
-                background-color: #ff6a33;
-            }
+        #hint-btn {
+            margin-top: 15px;
+            background-color: var(--famicom-cream);
+            color: var(--famicom-black);
+            font-size: 0.8em;
+            border: 2px solid var(--famicom-black);
+            box-shadow: 2px 2px 0px var(--famicom-black);
+        }
 
-            #quiz-modal {
-                background: rgba(255, 255, 255, 0.95);
-                color: #333;
-                padding: 30px;
-                border-radius: 15px;
-                width: 80%;
-                max-width: 600px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                position: relative;
-                z-index: 21;
-            }
+        #hint-text {
+            margin-top: 10px;
+            font-size: 0.9em;
+            background: #FDF5E6;
+            padding: 8px;
+            border: 2px dashed var(--famicom-black);
+            display: none;
+        }
 
-            #question-text {
-                font-size: 1.5em;
-                font-weight: bold;
-                margin-bottom: 30px;
-                width: 100%;
-                line-height: 1.4;
-            }
+        #feedback-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8em;
+            z-index: 30;
+            pointer-events: none;
+            opacity: 0;
+            display: none;
+        }
 
-            .ox-container {
-                display: flex;
-                justify-content: center;
-                gap: 20px;
-                width: 100%;
-            }
+        @keyframes pixelPop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
 
-            .ox-btn {
-                flex: 1;
-                padding: 20px;
-                font-size: 3em;
-                font-weight: 900;
-                border: 4px solid transparent;
-                border-radius: 15px;
-                color: white;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-                transition: transform 0.1s, box-shadow 0.1s;
-                cursor: pointer;
-            }
+        .anim-pop { animation: pixelPop 0.6s steps(4) forwards; }
 
-            .btn-o {
-                background-color: var(--color-o);
-            }
+        .mark-o {
+            color: var(--color-o);
+        }
 
-            .btn-x {
-                background-color: var(--color-x);
-            }
+        .mark-x {
+            color: var(--color-x);
+        }
+    </style>
+</head>
 
-            .ox-btn:hover {
-                transform: scale(1.05);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            }
+<body>
+    <div id="game-container">
+        <div id="hud">
+            <div class="hearts" id="heart-display">❤️❤️</div>
+            <div class="progress-text">STAGE <span id="level-display">1</span> / 5</div>
+        </div>
+        <div id="ground"></div>
+        <div id="player">🐱</div>
+        <div id="enemy" class="enemy">👽</div>
+        <div id="goal-flag">🚩</div>
+        <div id="feedback-overlay"></div>
 
-            .ox-btn:active {
-                transform: scale(0.95);
-            }
+        <div id="start-screen" class="overlay">
+            <h1>Bobcat Compliance Run</h1>
+            <p>
+                <b>OX 퀴즈 챌린지!</b><br><br>🐱 <b>밥캣</b>을(를) 도와 하도급법 위반 위험을 물리치세요!<br>
+                ⭕❌ <b>OX 퀴즈</b>를 풀어야 합니다.<br>
+                ❤️ <b>하트 2개</b>로 시작합니다.<br>
+                🚩 <b>5문제</b>를 맞추면 승리!
+            </p>
+            <button onclick="startGame()">RUN START! 🐱</button>
+        </div>
 
-            #hint-btn {
-                margin-top: 15px;
-                background-color: #f1f1f1;
-                color: #555;
-                padding: 10px 20px;
-                font-size: 0.9em;
-                border-radius: 20px;
-            }
-
-            #hint-text {
-                margin-top: 10px;
-                font-style: italic;
-                color: #666;
-                font-size: 0.95em;
-                background: #fff8e1;
-                padding: 10px;
-                border-radius: 8px;
-                display: none;
-                width: 100%;
-            }
-
-            #feedback-overlay {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 10em;
-                font-weight: bold;
-                z-index: 30;
-                pointer-events: none;
-                opacity: 0;
-                display: none;
-            }
-
-            @keyframes popIn {
-                0% {
-                    transform: translate(-50%, -50%) scale(0);
-                    opacity: 0;
-                }
-
-                50% {
-                    transform: translate(-50%, -50%) scale(1.2);
-                    opacity: 1;
-                }
-
-                100% {
-                    transform: translate(-50%, -50%) scale(1);
-                    opacity: 0;
-                }
-            }
-
-            .anim-pop {
-                animation: popIn 0.8s ease-out forwards;
-            }
-
-            .mark-o {
-                color: var(--color-o);
-            }
-
-            .mark-x {
-                color: var(--color-x);
-            }
-        </style>
-    </head>
-
-    <body>
-        <div id="game-container">
-            <div id="hud">
-                <div class="hearts" id="heart-display">❤️❤️</div>
-                <div class="progress-text">STAGE <span id="level-display">1</span> / 5</div>
-            </div>
-            <div id="ground"></div>
-            <div id="player">🐱</div>
-            <div id="enemy" class="enemy">👽</div>
-            <div id="goal-flag">🚩</div>
-            <div id="feedback-overlay"></div>
-
-            <div id="start-screen" class="overlay">
-                <h1>Bobcat Sanctions Run</h1>
-                <p>
-                    <b>OX 퀴즈 챌린지!</b><br><br>🐱 <b>고양이</b>를 도와 제재 위험들을 물리치세요!<br>
-                    ⭕❌ <b>OX 퀴즈</b>를 풀어야 합니다.<br>
-                    ❤️ <b>하트 2개</b>로 시작합니다.<br>
-                    🚩 <b>5문제</b>를 맞추면 승리!
-                </p>
-                <button onclick="startGame()">RUN START! 🐱</button>
-            </div>
-
-            <div id="quiz-screen" class="overlay hidden">
-                <div id="quiz-modal">
-                    <div id="question-text">Q. 질문이 여기에 나옵니다.</div>
-                    <div class="ox-container">
-                        <button class="ox-btn btn-o" onclick="handleAnswer('O')">O</button>
-                        <button class="ox-btn btn-x" onclick="handleAnswer('X')">X</button>
-                    </div>
-                    <button id="hint-btn" onclick="showHint()">💡 힌트 보기</button>
-                    <div id="hint-text"></div>
+        <div id="quiz-screen" class="overlay hidden">
+            <div id="quiz-modal">
+                <div id="question-text">Q. 질문이 여기에 나옵니다.</div>
+                <div class="ox-container">
+                    <button class="ox-btn btn-o" onclick="handleAnswer('O')">O</button>
+                    <button class="ox-btn btn-x" onclick="handleAnswer('X')">X</button>
                 </div>
-            </div>
-
-            <div id="win-screen" class="overlay hidden">
-                <h1>🎉 MISSION CLEAR! 🎉</h1>
-                <p>모든 위협을 물리쳤습니다!<br>밥캣의 승리!</p>
-                <p id="final-stats">남은 하트: ❤️❤️</p>
-                <button onclick="sendEmail()">📧 컴플라이언스 퀴즈 상품 응모하기</button>
-                <button onclick="location.reload()" style="margin-top: 15px; background-color: #4CAF50;">🔄 다시
-                    도전하기</button>
-            </div>
-
-            <div id="lose-screen" class="overlay hidden">
-                <h1>GAME OVER... 💥</h1>
-                <p>밥캣이 제재 대상으로 지정되었습니다.<br>두산그룹도 제재 대상이 되어 비즈니스에 심각한 영향을 주게 되었습니다.</p>
-                <button onclick="location.reload()">🔄 다시 시작하기</button>
+                <button id="hint-btn" onclick="showHint()">💡 힌트 보기</button>
+                <div id="hint-text"></div>
             </div>
         </div>
 
-        <script>
-            const MAX_HEARTS = 2;
-            const TOTAL_STAGES = 5;
-            let hearts = 2;
-            let currentStage = 1;
-            let isRunning = false;
-            let animationFrameId;
-            let enemyPosition = 900;
-            let currentQuestion = null;
-            let usedQuestionIndices = [];
+        <div id="win-screen" class="overlay hidden">
+            <h1>🎉 MISSION CLEAR! 🎉</h1>
+            <p>모든 위협을 물리쳤습니다!<br>밥캣의 승리!</p>
+            <p id="final-stats">남은 하트: ❤️❤️</p>
+            <button onclick="sendEmail()">📧 컴플라이언스 퀴즈 상품 응모하기</button>
+            <button onclick="location.reload()" style="margin-top: 15px; background-color: #4CAF50;">🔄 다시 도전하기</button>
+        </div>
 
-            const heartDisplay = document.getElementById('heart-display');
-            const levelDisplay = document.getElementById('level-display');
-            const playerEl = document.getElementById('player');
-            const enemyEl = document.getElementById('enemy');
-            const groundEl = document.getElementById('ground');
-            const feedbackOverlay = document.getElementById('feedback-overlay');
-            const quizScreen = document.getElementById('quiz-screen');
-            const startScreen = document.getElementById('start-screen');
-            const winScreen = document.getElementById('win-screen');
-            const loseScreen = document.getElementById('lose-screen');
-            const goalFlag = document.getElementById('goal-flag');
+        <div id="lose-screen" class="overlay hidden">
+            <h1>GAME OVER... 💥</h1>
+            <p>밥캣은(는) 하도급법 위반으로 공정위에 고발되었습니다.<br>
+                하도급 대금의 2배 이하 벌금, 3년 이하 징역 또는 3천만 원 이하 벌금, 4~8개월 영업정지, 하도급대금의 30% 이내 과징금이 선고되었습니다.</p>
+            <button onclick="location.reload()">🔄 다시 시작하기</button>
+        </div>
+    </div>
 
-            const questionBank = [
-                { q: "원사업자는 수급사업자에게 제조 등의 위탁을 할 때 반드시 서면을 발급해야 한다.", a: "O", hint: "사전에 서면을 발급하지 않는 것은 대표적인 하도급법 위반입니다." },
-                { q: "수급사업자의 귀책사유 없이 부당하게 발주를 취소하는 것은 하도급법 위반이다.", a: "O", hint: "일방적인 위탁 취소는 금지됩니다." },
-                { q: "하도급대금은 법정 지급기일과 상관없이 합의만 하면 언제든 지급해도 된다.", a: "X", hint: "목적물 수령일로부터 60일 이내에 지급해야 합니다." },
-                { q: "원사업자가 불황을 이유로 정당한 사유 없이 하도급대금을 감액하는 것은 허용된다.", a: "X", hint: "정당한 사유 없는 감액은 불법입니다." },
-                { q: "수급사업자가 기술자료 제공을 거부하면 거래를 끊어도 된다.", a: "X", hint: "기술자료 제공 강요는 금지되어 있습니다." },
-                { q: "하도급법은 대기업과 중소기업 간의 거래에만 적용된다.", a: "X", hint: "요건을 충족하면 중견기업이나 일부 중소기업 간 거래에도 적용됩니다." },
-                { q: "원재료 가격이 급등하면 수급사업자는 하도급대금 조정을 신청할 수 있다.", a: "O", hint: "납품대금 연동제 등이 시행되고 있습니다." },
-                { q: "발주자는 하도급대금을 수급사업자에게 직접 지급할 수 있는 경우가 있다.", a: "O", hint: "발주자 직불 사유 발생 시 직접 지급이 가능합니다." },
-                { q: "부당한 반품은 하도급법에서 금지하는 불공정 행위이다.", a: "O", hint: "수급사업자의 귀책사유 없는 반품은 금지됩니다." },
-                { q: "원사업자는 수급사업자의 의사에 반하여 물품 구매를 강제할 수 있다.", a: "X", hint: "정당한 사유 없는 물품 구매 강제는 불법입니다." },
-                { q: "하도급대금을 목적물 수령일로부터 60일을 초과하여 지급할 경우 지연이자를 지급해야 한다.", a: "O", hint: "연 15.5%의 지연이자가 발생합니다." },
-                { q: "서면 발급은 공사나 제조가 끝난 후에 해도 무방하다.", a: "X", hint: "원칙적으로 착수 전에 발급해야 합니다." },
-                { q: "상대방의 동의가 있다면 하도급대금을 물품으로 지급해도 된다.", a: "X", hint: "강제로 물품 지급(대물변제)은 금지됩니다." },
-                { q: "표준하도급계약서 사용은 법적으로 의무화되어 있다.", a: "X", hint: "권장 사항이며, 사용 시 벌점 감경 등의 혜택이 있습니다." },
-                { q: "경쟁 입찰 시 최저가 입찰 금액보다 낮은 금액으로 하도급대금을 결정하는 것은 불법이다.", a: "O", hint: "부당한 하도급대금 결정 행위입니다." },
-                { q: "수급사업자는 원사업자의 승낙 없이 재위탁을 할 수 있다.", a: "X", hint: "재하도급은 원사업자의 승낙이 필요합니다." },
-                { q: "하도급 분쟁 조정 신청은 시효 중단의 효력이 있다.", a: "O", hint: "조정 신청 시점부터 시효가 중단됩니다." },
-                { q: "공정위는 상습적인 하도급법 위반 사업자의 명단을 공표할 수 있다.", a: "O", hint: "벌점 누적 시 명단 공표 대상이 됩니다." },
-                { q: "원사업자는 정당한 사유 없이 수급사업자에게 전속 거래를 강요해서는 안 된다.", a: "O", hint: "기술 등을 다른 사업자와 거래하지 못하게 하는 것은 불법입니다." },
-                { q: "구두로만 계약한 경우 수급사업자는 계약 내용을 입증할 방법이 전혀 없다.", a: "X", hint: "계약 추정 제도를 통해 내용증명 등으로 입증 기회가 있습니다." },
-                { q: "하도급대금을 감액하려면 감액 사유와 기준을 적은 서면을 미리 줘야 한다.", a: "O", hint: "서면 없이 감액하는 것은 절차적 위반입니다." },
-                { q: "원재료 가격이 하락하면 원사업자는 하도급대금 감액을 요구할 수 있다.", a: "O", hint: "공급원가 변동 시 양 당사자 모두 조정 신청이 가능합니다." },
-                { q: "기술자료 유용 행위는 징벌적 손해배상(3배) 대상이다.", a: "O", hint: "악의적인 위반 행위로 간주됩니다." },
-                { q: "부당한 반품 행위는 징벌적 손해배상 대상이 아니다.", a: "X", hint: "부당 반품, 부당 감액 등은 징벌적 손해배상 대상입니다." },
-                { q: "수급사업자가 관세 환급금을 받는 것은 원천적으로 금지된다.", a: "X", hint: "수출용 원재료에 대한 관세 환급금은 정당하게 받아야 합니다." },
-                { q: "발주자로부터 설계 변경으로 증액을 받은 경우, 30일 이내에 수급사업자에게 대금을 증액해줘야 한다.", a: "O", hint: "받은 날로부터 30일 이내입니다." },
-                { q: "설계 변경 증액 내용은 발주자로부터 받은 날로부터 15일 이내에 통지해야 한다.", a: "O", hint: "15일 이내 통지 의무가 있습니다." },
-                { q: "건설 공사 기간이 연장되어도 추가 비용은 지급할 필요가 없다.", a: "X", hint: "기간 연장에 따른 추가 비용도 지급해야 합니다." },
-                { q: "발주자가 인건비를 직접 수급사업자에게 주기로 합의하면 원사업자의 지급 의무는 면제된다.", a: "O", hint: "직불 합의 시 원사업자의 의무는 소멸합니다." },
-                { q: "하도급법 위반 조사는 거래 종료일로부터 3년이 지나면 개시할 수 없다.", a: "O", hint: "조사 시효는 원칙적으로 3년입니다." }
-            ];
+    <script>
+        const MAX_HEARTS = 2;
+        const TOTAL_STAGES = 5;
+        let hearts = 2;
+        let currentStage = 1;
+        let isRunning = false;
+        let animationFrameId;
+        let enemyPosition = 900;
+        let currentQuestion = null;
+        let usedQuestionIndices = [];
 
-            function startGame() {
-                hearts = 2; currentStage = 1; enemyPosition = 900;
-                playerEl.style.left = '50px'; playerEl.classList.remove('walking');
-                goalFlag.style.display = 'none'; enemyEl.style.display = 'block';
-                updateHUD(); startScreen.classList.add('hidden');
-                isRunning = true; gameLoop();
+        const heartDisplay = document.getElementById('heart-display');
+        const levelDisplay = document.getElementById('level-display');
+        const playerEl = document.getElementById('player');
+        const enemyEl = document.getElementById('enemy');
+        const groundEl = document.getElementById('ground');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
+        const quizScreen = document.getElementById('quiz-screen');
+        const startScreen = document.getElementById('start-screen');
+        const winScreen = document.getElementById('win-screen');
+        const loseScreen = document.getElementById('lose-screen');
+        const goalFlag = document.getElementById('goal-flag');
+
+        const questionBank = [
+            { q: "원사업자는 수급사업자에게 제조 등의 위탁을 할 때 반드시 서면을 발급해야 한다.", a: "O", hint: "사전에 서면을 발급하지 않는 것은 대표적인 하도급법 위반입니다." },
+            { q: "수급사업자의 귀책사유 없이 부당하게 발주를 취소하는 것은 하도급법 위반이다.", a: "O", hint: "일방적인 위탁 취소는 금지됩니다." },
+            { q: "하도급대금은 법정 지급기일과 상관없이 합의만 하면 언제든 지급해도 된다.", a: "X", hint: "목적물 수령일로부터 60일 이내에 지급해야 합니다." },
+            { q: "원사업자가 불황을 이유로 정당한 사유 없이 하도급대금을 감액하는 것은 허용된다.", a: "X", hint: "정당한 사유 없는 감액은 불법입니다." },
+            { q: "수급사업자가 기술자료 제공을 거부하면 거래를 끊어도 된다.", a: "X", hint: "기술자료 제공 강요는 금지되어 있습니다." },
+            { q: "하도급법은 대기업과 중소기업 간의 거래에만 적용된다.", a: "X", hint: "요건을 충족하면 중견기업이나 일부 중소기업 간 거래에도 적용됩니다." },
+            { q: "원재료 가격이 급등하면 수급사업자는 하도급대금 조정을 신청할 수 있다.", a: "O", hint: "납품대금 연동제 등이 시행되고 있습니다." },
+            { q: "발주자는 하도급대금을 수급사업자에게 직접 지급할 수 있는 경우가 있다.", a: "O", hint: "발주자 직불 사유 발생 시 직접 지급이 가능합니다." },
+            { q: "부당한 반품은 하도급법에서 금지하는 불공정 행위이다.", a: "O", hint: "수급사업자의 귀책사유 없는 반품은 금지됩니다." },
+            { q: "원사업자는 수급사업자의 의사에 반하여 물품 구매를 강제할 수 있다.", a: "X", hint: "정당한 사유 없는 물품 구매 강제는 불법입니다." },
+            { q: "하도급대금을 목적물 수령일로부터 60일을 초과하여 지급할 경우 지연이자가 발생한다.", a: "O", hint: "연 15.5%의 지연이자가 발생합니다." },
+            { q: "서면 발급은 공사나 제조가 끝난 후에 해도 무방하다.", a: "X", hint: "원칙적으로 착수 전에 발급해야 합니다." },
+            { q: "상대방의 동의가 있다면 하도급대금을 물품으로 지급해도 된다.", a: "X", hint: "강제로 물품 지급(대물변제)은 금지됩니다." },
+            { q: "표준하도급계약서 사용은 법적으로 의무화되어 있다.", a: "X", hint: "권장 사항 있으며, 사용 시 벌점 감경 등의 혜택이 있습니다." },
+            { q: "경쟁 입찰 시 최저가 입찰 금액보다 낮은 금액으로 하도급대금을 결정하는 것은 불법이다.", a: "O", hint: "부당한 하도급대금 결정 행위입니다." },
+            { q: "수급사업자는 원사업자의 승낙 없이 재위탁을 할 수 있다.", a: "X", hint: "재하도급은 원사업자의 승낙이 필요합니다." },
+            { q: "하도급 분쟁 조정 신청은 시효 중단의 효력이 있다.", a: "O", hint: "조정 신청 시점부터 시효가 중단됩니다." },
+            { q: "공정위는 상습적인 하도급법 위반 사업자의 명단을 공표할 수 있다.", a: "O", hint: "벌점 누적 시 명단 공표 대상이 됩니다." },
+            { q: "원사업자는 정당한 사유 없이 수급사업자에게 전속 거래를 강요해서는 안 된다.", a: "O", hint: "기술 등을 다른 사업자와 거래하지 못하게 하는 것은 불법입니다." },
+            { q: "구두로만 계약한 경우 수급사업자는 계약 내용을 입증할 방법이 전혀 없다.", a: "X", hint: "계약 추정 제도를 통해 내용증명 등으로 입증 기회가 있습니다." },
+            { q: "하도급대금을 감액하려면 감액 사유와 기준을 적은 서면을 미리 줘야 한다.", a: "O", hint: "서면 없이 감액하는 것은 절차적 위반입니다." },
+            { q: "원재료 가격이 하락하면 원사업자는 하도급대금 감액을 요구할 수 있다.", a: "O", hint: "공급원가 변동 시 양 당사자 모두 조정 신청이 가능합니다." },
+            { q: "기술자료 유용 행위는 징벌적 손해배상(3배) 대상이다.", a: "O", hint: "악의적인 위반 행위로 간주됩니다." },
+            { q: "부당한 반품 행위는 징벌적 손해배상 대상이 아니다.", a: "X", hint: "부당 반품, 부당 감액 등은 징벌적 손해배상 대상입니다." },
+            { q: "수급사업자가 관세 환급금을 받는 것은 원천적으로 금지된다.", a: "X", hint: "수출용 원재료에 대한 관세 환급금은 정당하게 받아야 합니다." },
+            { q: "발주자로부터 설계 변경으로 증액을 받은 경우, 30일 이내에 수급사업자에게 대금을 증액해줘야 한다.", a: "O", hint: "받은 날로부터 30일 이내입니다." },
+            { q: "설계 변경 증액 내용은 발주자로부터 받은 날로부터 15일 이내에 통지해야 한다.", a: "O", hint: "15일 이내 통지 의무가 있습니다." },
+            { q: "건설 공사 기간이 연장되어도 추가 비용은 지급할 필요가 없다.", a: "X", hint: "기간 연장에 따른 추가 비용도 지급해야 합니다." },
+            { q: "발주자가 인건비를 직접 수급사업자에게 주기로 합의하면 원사업자의 지급 의무는 면제된다.", a: "O", hint: "직불 합의 시 원사업자의 의무는 소멸합니다." },
+            { q: "하도급법 위반 조사는 거래 종료일로부터 3년이 지나면 개시할 수 없다.", a: "O", hint: "조사 시효는 원칙적으로 3년입니다." }
+        ];
+
+        function startGame() {
+            hearts = 2; currentStage = 1; enemyPosition = 900;
+            playerEl.style.left = '50px'; playerEl.classList.remove('walking');
+            goalFlag.style.display = 'none'; enemyEl.style.display = 'block';
+            updateHUD(); startScreen.classList.add('hidden');
+            isRunning = true; gameLoop();
+        }
+
+        function updateHUD() {
+            let str = "";
+            for (let i = 0; i < 2; i++) {
+                if (hearts >= i + 1) str += "❤️";
+                else if (hearts > i) str += "💔";
+                else str += "🤍";
             }
+            heartDisplay.innerText = str;
+            levelDisplay.innerText = Math.min(currentStage, 5);
+        }
 
-            function updateHUD() {
-                let str = "";
-                for (let i = 0; i < 2; i++) {
-                    if (hearts >= i + 1) str += "❤️";
-                    else if (hearts > i) str += "💔";
-                    else str += "🤍";
+        function gameLoop() {
+            if (!isRunning) return;
+            enemyPosition -= 8;
+            if (enemyPosition < -100) { enemyPosition = 900; spawnEnemy(); }
+            if (enemyPosition < 100 && enemyPosition > 30) { pauseGame(); triggerEncounter(); }
+            enemyEl.style.left = enemyPosition + 'px';
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function spawnEnemy() {
+            const types = ['👽', '💣', '🔫', '🪖', '🔪', '💉', '💸'];
+            enemyEl.innerText = types[Math.floor(Math.random() * types.length)];
+        }
+
+        function pauseGame() { isRunning = false; cancelAnimationFrame(animationFrameId); }
+
+        function triggerEncounter() {
+            let idx = Math.floor(Math.random() * questionBank.length);
+            currentQuestion = questionBank[idx];
+            quizScreen.classList.remove('hidden');
+            quizScreen.style.display = 'flex';
+            document.getElementById('question-text').innerText = "Q" + currentStage + ". " + currentQuestion.q;
+            document.getElementById('hint-text').style.display = 'none';
+            document.getElementById('hint-btn').style.display = 'block';
+        }
+
+        function showHint() {
+            document.getElementById('hint-text').innerText = "💡 힌트: " + currentQuestion.hint;
+            document.getElementById('hint-text').style.display = 'block';
+            document.getElementById('hint-btn').style.display = 'none';
+        }
+
+        function handleAnswer(choice) {
+            const correct = (choice === currentQuestion.a);
+            quizScreen.classList.add('hidden');
+            quizScreen.style.display = 'none';
+            showFeedback(correct);
+            setTimeout(() => {
+                if (correct) {
+                    hearts = Math.min(hearts + 0.5, 2);
+                    currentStage++;
+                    if (currentStage > 5) startVictorySequence(); else resumeGame();
+                } else {
+                    hearts -= 1;
+                    if (hearts <= 0) loseGame(); else resumeGame();
                 }
-                heartDisplay.innerText = str;
-                levelDisplay.innerText = Math.min(currentStage, 5);
-            }
+                updateHUD();
+            }, 1000);
+        }
 
-            function gameLoop() {
-                if (!isRunning) return;
-                enemyPosition -= 8;
-                if (enemyPosition < -100) { enemyPosition = 900; spawnEnemy(); }
-                if (enemyPosition < 100 && enemyPosition > 30) { pauseGame(); triggerEncounter(); }
-                enemyEl.style.left = enemyPosition + 'px';
-                animationFrameId = requestAnimationFrame(gameLoop);
-            }
+        function showFeedback(correct) {
+            feedbackOverlay.style.display = 'block';
+            feedbackOverlay.innerText = correct ? "🙆‍♂️" : "🙅‍♂️";
+            feedbackOverlay.className = (correct ? "mark-o" : "mark-x") + " anim-pop";
+            setTimeout(() => { feedbackOverlay.style.display = 'none'; }, 800);
+        }
 
-            function spawnEnemy() {
-                const types = ['👽', '💣', '🔫', '🪖', '🔪', '💉', '💸'];
-                enemyEl.innerText = types[Math.floor(Math.random() * types.length)];
-            }
+        function startVictorySequence() {
+            isRunning = false;
+            cancelAnimationFrame(animationFrameId);
+            groundEl.style.animation = 'none';
+            enemyEl.style.display = 'none';
+            goalFlag.style.display = 'block';
+            setTimeout(() => {
+                playerEl.classList.add('walking');
+                playerEl.style.left = (document.getElementById('game-container').offsetWidth - 150) + 'px';
+                setTimeout(() => { winGame(); }, 2600);
+            }, 500);
+        }
 
-            function pauseGame() { isRunning = false; cancelAnimationFrame(animationFrameId); }
+        function resumeGame() { enemyPosition = 900; spawnEnemy(); isRunning = true; gameLoop(); }
+        function winGame() {
+            document.getElementById('final-stats').innerText = "남은 하트: " + heartDisplay.innerText;
+            winScreen.classList.remove('hidden');
+        }
+        function loseGame() { loseScreen.classList.remove('hidden'); }
+        function sendEmail() {
+            const recipient = "bobcat.cp@doosan.com";
+            const subject = "[컴플라이언스 퀴즈] 상품 응모";
+            let body = "이 메일은 두산밥캣 컴플라이언스 런을 완수하신 분들에게만 제공됩니다.\r\n";
+            body += "응모하신 분들 중 5명을 추첨하여 소정의 상품(Bobcat Miniature)를 제공할 예정입니다. 성명과 부서를 아래 입력 하시어 회신 하시면 응모가 완료 됩니다.\r\n\r\n";
+            body += " - 성명 : \r\n";
+            body += " - 부서 : \r\n\r\n";
+            body += "항상 두산밥캣의 Compliance 자율준수를 위해 노력해 주셔서 감사합니다.\r\n";
+            body += "Do the Right Things!";
+            window.location.href = "mailto:" + recipient + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        }
+    </script>
+</body>
 
-            function triggerEncounter() {
-                let idx = Math.floor(Math.random() * questionBank.length);
-                currentQuestion = questionBank[idx];
-                quizScreen.classList.remove('hidden');
-                quizScreen.style.display = 'flex';
-                document.getElementById('question-text').innerText = "Q" + currentStage + ". " + currentQuestion.q;
-                document.getElementById('hint-text').style.display = 'none';
-                document.getElementById('hint-btn').style.display = 'block';
-            }
-
-            function showHint() {
-                document.getElementById('hint-text').innerText = "💡 힌트: " + currentQuestion.hint;
-                document.getElementById('hint-text').style.display = 'block';
-                document.getElementById('hint-btn').style.display = 'none';
-            }
-
-            function handleAnswer(choice) {
-                const correct = (choice === currentQuestion.a);
-                quizScreen.classList.add('hidden');
-                quizScreen.style.display = 'none';
-                showFeedback(correct);
-                setTimeout(() => {
-                    if (correct) {
-                        hearts = Math.min(hearts + 0.5, 2);
-                        currentStage++;
-                        if (currentStage > 5) startVictorySequence(); else resumeGame();
-                    } else {
-                        hearts -= 1;
-                        if (hearts <= 0) loseGame(); else resumeGame();
-                    }
-                    updateHUD();
-                }, 1000);
-            }
-
-            function showFeedback(correct) {
-                feedbackOverlay.style.display = 'block';
-                feedbackOverlay.innerText = correct ? "🙆‍♂️" : "🙅‍♂️";
-                feedbackOverlay.className = (correct ? "mark-o" : "mark-x") + " anim-pop";
-                setTimeout(() => { feedbackOverlay.style.display = 'none'; }, 800);
-            }
-
-            function startVictorySequence() {
-                isRunning = false;
-                cancelAnimationFrame(animationFrameId);
-                groundEl.style.animation = 'none';
-                enemyEl.style.display = 'none';
-                goalFlag.style.display = 'block';
-                setTimeout(() => {
-                    playerEl.classList.add('walking');
-                    playerEl.style.left = (document.getElementById('game-container').offsetWidth - 150) + 'px';
-                    setTimeout(() => { winGame(); }, 2600);
-                }, 500);
-            }
-
-            function resumeGame() { enemyPosition = 900; spawnEnemy(); isRunning = true; gameLoop(); }
-            function winGame() {
-                document.getElementById('final-stats').innerText = "남은 하트: " + heartDisplay.innerText;
-                winScreen.classList.remove('hidden');
-            }
-            function loseGame() { loseScreen.classList.remove('hidden'); }
-            function sendEmail() {
-                const recipient = "bobcat.cp@doosan.com";
-                const subject = "[컴플라이언스 퀴즈] 상품 응모";
-                let body = "이 메일은 두산밥캣 컴플라이언스 런을 완수하신 분들에게만 제공됩니다.\r\n";
-                body += "응모하신 분들 중 5명을 추첨하여 소정의 상품(Bobcat Miniature)를 제공할 예정입니다. 성명과 부서를 아래 입력 하시어 회신 하시면 응모가 완료 됩니다.\r\n\r\n";
-                body += " - 성명 : \r\n";
-                body += " - 부서 : \r\n\r\n";
-                body += "항상 두산밥캣의 Compliance 자율준수를 위해 노력해 주셔서 감사합니다.\r\n";
-                body += "Do the Right Things!";
-                window.location.href = "mailto:" + recipient + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-            }
-        </script>
-    </body>
-
-    </html>
+</html>

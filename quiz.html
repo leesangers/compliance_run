@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -7,103 +7,95 @@
     <title>Bobcat Compliance Run - 하도급법 OX 퀴즈</title>
     <style>
         :root {
-            --primary-color: #000000;
-            --accent-color: #F15A22;
-            --bg-sky: #87CEEB;
-            --bg-ground: #8B4513;
+            --famicom-red: #A01010;
+            --famicom-gold: #FFD700;
+            --famicom-cream: #E8E0D0;
+            --famicom-black: #000000;
             --color-o: #2196F3;
             --color-x: #F44336;
         }
 
         body {
-            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-            background-color: #333;
-            color: #333;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: transparent;
+            color: var(--famicom-black);
             margin: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 100vh;
             overflow: hidden;
+            image-rendering: pixelated;
         }
 
         #game-container {
             position: relative;
             width: 800px;
-            max-width: 95vw;
+            max-width: 100%;
             height: 400px;
-            background: linear-gradient(#87CEEB 0%, #E0F6FF 80%);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background-color: var(--famicom-cream);
+            /* Pixelated border using box-shadow */
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                8px 8px 0px 0px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             pointer-events: auto;
+            margin: 10px auto;
+        }
+
+        /* Sharper scanline and pixel grid effect */
+        #game-container::after {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.03), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 4px 100%;
+            pointer-events: none;
+            z-index: 100;
         }
 
         @media (max-width: 800px) {
-            #game-container {
-                height: 350px;
-            }
-
-            #hud {
-                font-size: 1.2em;
-            }
-
-            #question-text {
-                font-size: 1.2em;
-            }
-
-            .ox-btn {
-                font-size: 2em;
-                padding: 10px;
-            }
-
-            #player,
-            #goal-flag {
-                font-size: 3em;
-            }
-
-            .enemy {
-                font-size: 2.5em;
-            }
+            #game-container { height: 350px; }
+            #hud { font-size: 1em; }
+            #question-text { font-size: 1em; }
+            .ox-btn { font-size: 1.5em; padding: 10px; }
+            #player, #goal-flag { font-size: 2.5em; }
+            .enemy { font-size: 2em; }
         }
 
         #hud {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 15px;
+            left: 15px;
+            right: 15px;
             display: flex;
             justify-content: space-between;
-            font-size: 1.5em;
+            font-size: 1.25em;
             font-weight: bold;
             z-index: 10;
+            text-transform: uppercase;
         }
 
-        .hearts {
-            color: red;
-        }
-
-        .progress-text {
-            color: var(--primary-color);
-        }
+        .hearts { color: var(--famicom-red); }
 
         #ground {
             position: absolute;
             bottom: 0;
             width: 200%;
             height: 60px;
-            background: repeating-linear-gradient(90deg, #5D4037, #5D4037 50px, #795548 50px, #795548 100px);
-            animation: scrollGround 2s linear infinite;
+            background-color: #5D4037;
+            border-top: 4px solid var(--famicom-black);
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 46px, var(--famicom-black) 46px, var(--famicom-black) 50px);
+            animation: scrollGround 1s steps(8) infinite;
         }
 
         @keyframes scrollGround {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-100px);
-            }
+            from { transform: translateX(0); }
+            to { transform: translateX(-50px); }
         }
 
         #player {
@@ -111,24 +103,18 @@
             bottom: 60px;
             left: 50px;
             font-size: 4em;
-            animation: runBounce 0.4s infinite alternate ease-in-out;
+            animation: runStep 0.4s steps(2) infinite;
             z-index: 5;
-            filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
         }
 
-        @keyframes runBounce {
-            from {
-                transform: translateY(0);
-            }
-
-            to {
-                transform: translateY(-15px);
-            }
+        @keyframes runStep {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
         }
 
         #player.walking {
             animation: none;
-            transition: left 2.5s linear;
+            transition: left 2s steps(20) linear;
         }
 
         #goal-flag {
@@ -138,7 +124,6 @@
             font-size: 4em;
             display: none;
             z-index: 4;
-            filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
         }
 
         .enemy {
@@ -147,7 +132,6 @@
             right: -100px;
             font-size: 3.5em;
             z-index: 4;
-            filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.5));
         }
 
         .overlay {
@@ -156,132 +140,131 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: var(--famicom-cream);
             z-index: 20;
             text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
         h1 {
             margin: 0 0 20px 0;
-            color: var(--accent-color);
+            color: var(--famicom-gold);
             font-size: 2.5em;
+            text-shadow: 4px 4px 0px var(--famicom-red);
+            letter-spacing: -2px;
         }
 
         p {
-            font-size: 1.2em;
-            line-height: 1.6;
-            margin-bottom: 30px;
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin-bottom: 25px;
         }
 
         button {
-            background-color: var(--accent-color);
-            color: white;
+            background-color: var(--famicom-red);
+            color: var(--famicom-cream);
+            /* Pixel border */
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                4px 4px 0px 0px var(--famicom-black);
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2em;
+            padding: 12px 30px;
+            font-size: 1.1em;
             font-weight: bold;
-            border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 0 5px 15px rgba(241, 90, 34, 0.4);
-            position: relative;
-            z-index: 25;
+            text-transform: uppercase;
+            font-family: inherit;
+            margin: 6px;
         }
 
         button:hover {
-            transform: scale(1.05);
-            background-color: #ff6a33;
+            transform: translate(-2px, -2px);
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                6px 6px 0px 0px var(--famicom-black);
+            background-color: #c01010;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--famicom-black);
         }
 
         #quiz-modal {
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
+            background: var(--famicom-cream);
+            /* Pixel border */
+            box-shadow: 
+                0 -4px 0 0 var(--famicom-black),
+                0 4px 0 0 var(--famicom-black),
+                -4px 0 0 0 var(--famicom-black),
+                4px 0 0 0 var(--famicom-black),
+                8px 8px 0px 0px var(--famicom-black);
+            color: var(--famicom-black);
             padding: 30px;
-            border-radius: 15px;
-            width: 80%;
-            max-width: 600px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 85%;
+            max-width: 500px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;
-            position: relative;
-            z-index: 21;
         }
 
         #question-text {
-            font-size: 1.5em;
+            font-size: 1.25em;
             font-weight: bold;
-            margin-bottom: 30px;
-            width: 100%;
-            line-height: 1.4;
+            margin-bottom: 20px;
+            line-height: 1.6;
         }
 
         .ox-container {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
         }
 
         .ox-btn {
             flex: 1;
-            padding: 20px;
-            font-size: 3em;
-            font-weight: 900;
-            border: 4px solid transparent;
-            border-radius: 15px;
+            padding: 15px;
+            font-size: 2.5em;
+            font-weight: bold;
+            border: 4px solid var(--famicom-black);
             color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            transition: transform 0.1s, box-shadow 0.1s;
-            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--famicom-black);
         }
 
-        .btn-o {
-            background-color: var(--color-o);
-        }
-
-        .btn-x {
-            background-color: var(--color-x);
-        }
-
-        .ox-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .ox-btn:active {
-            transform: scale(0.95);
-        }
+        .btn-o { background-color: var(--color-o); }
+        .btn-x { background-color: var(--color-x); }
 
         #hint-btn {
             margin-top: 15px;
-            background-color: #f1f1f1;
-            color: #555;
-            padding: 10px 20px;
-            font-size: 0.9em;
-            border-radius: 20px;
+            background-color: var(--famicom-cream);
+            color: var(--famicom-black);
+            font-size: 0.8em;
+            border: 2px solid var(--famicom-black);
+            box-shadow: 2px 2px 0px var(--famicom-black);
         }
 
         #hint-text {
             margin-top: 10px;
-            font-style: italic;
-            color: #666;
-            font-size: 0.95em;
-            background: #fff8e1;
-            padding: 10px;
-            border-radius: 8px;
+            font-size: 0.9em;
+            background: #FDF5E6;
+            padding: 8px;
+            border: 2px dashed var(--famicom-black);
             display: none;
-            width: 100%;
         }
 
         #feedback-overlay {
@@ -289,34 +272,20 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 10em;
-            font-weight: bold;
+            font-size: 8em;
             z-index: 30;
             pointer-events: none;
             opacity: 0;
             display: none;
         }
 
-        @keyframes popIn {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-
-            50% {
-                transform: translate(-50%, -50%) scale(1.2);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0;
-            }
+        @keyframes pixelPop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
         }
 
-        .anim-pop {
-            animation: popIn 0.8s ease-out forwards;
-        }
+        .anim-pop { animation: pixelPop 0.6s steps(4) forwards; }
 
         .mark-o {
             color: var(--color-o);
@@ -413,7 +382,7 @@
             { q: "발주자는 하도급대금을 수급사업자에게 직접 지급할 수 있는 경우가 있다.", a: "O", hint: "발주자 직불 사유 발생 시 직접 지급이 가능합니다." },
             { q: "부당한 반품은 하도급법에서 금지하는 불공정 행위이다.", a: "O", hint: "수급사업자의 귀책사유 없는 반품은 금지됩니다." },
             { q: "원사업자는 수급사업자의 의사에 반하여 물품 구매를 강제할 수 있다.", a: "X", hint: "정당한 사유 없는 물품 구매 강제는 불법입니다." },
-            { q: "하도급대금을 목적물 수령일로부터 60일을 초과하여 지급할 경우 지연이자를 지급해야 한다.", a: "O", hint: "연 15.5%의 지연이자가 발생합니다." },
+            { q: "하도급대금을 목적물 수령일로부터 60일을 초과하여 지급할 경우 지연이자가 발생한다.", a: "O", hint: "연 15.5%의 지연이자가 발생합니다." },
             { q: "서면 발급은 공사나 제조가 끝난 후에 해도 무방하다.", a: "X", hint: "원칙적으로 착수 전에 발급해야 합니다." },
             { q: "상대방의 동의가 있다면 하도급대금을 물품으로 지급해도 된다.", a: "X", hint: "강제로 물품 지급(대물변제)은 금지됩니다." },
             { q: "표준하도급계약서 사용은 법적으로 의무화되어 있다.", a: "X", hint: "권장 사항 있으며, 사용 시 벌점 감경 등의 혜택이 있습니다." },

@@ -23,18 +23,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow: hidden;
+            overflow-x: hidden;
             image-rendering: pixelated;
         }
 
         #game-container {
             position: relative;
             width: 800px;
-            max-width: 100%;
-            height: 400px;
+            max-width: calc(100% - 16px);
+            box-sizing: border-box;
+            height: 500px;
             background-color: var(--famicom-cream);
             /* Pixelated border using box-shadow */
-            box-shadow: 
+            box-shadow:
                 0 -4px 0 0 var(--famicom-black),
                 0 4px 0 0 var(--famicom-black),
                 -4px 0 0 0 var(--famicom-black),
@@ -49,9 +50,12 @@
         #game-container::after {
             content: " ";
             position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: 
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background:
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%),
                 linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.03), rgba(0, 0, 255, 0.03));
             background-size: 100% 4px, 4px 100%;
             pointer-events: none;
@@ -59,12 +63,38 @@
         }
 
         @media (max-width: 800px) {
-            #game-container { height: 350px; }
-            #hud { font-size: 1em; }
-            #question-text { font-size: 1em; }
-            .ox-btn { font-size: 1.5em; padding: 10px; }
-            #player, #goal-flag { font-size: 2.5em; }
-            .enemy { font-size: 2em; }
+            #game-container {
+                height: 550px;
+                margin: 8px auto;
+            }
+
+
+            #hud {
+                font-size: 1em;
+            }
+
+            #question-text {
+                font-size: 0.9em;
+            }
+
+            .ox-btn {
+                font-size: 1.5em;
+                padding: 10px;
+            }
+
+            #player,
+            #goal-flag {
+                font-size: 2.5em;
+            }
+
+            .enemy {
+                font-size: 2em;
+            }
+            
+            h1 { font-size: 1.8em; margin-bottom: 10px; }
+            p { font-size: 0.9em; margin-bottom: 15px; }
+            button { font-size: 0.9em; padding: 10px 15px; margin: 4px; }
+            #user-name, #user-dept { width: 100px !important; }
         }
 
         #hud {
@@ -80,7 +110,9 @@
             text-transform: uppercase;
         }
 
-        .hearts { color: var(--famicom-red); }
+        .hearts {
+            color: var(--famicom-red);
+        }
 
         #ground {
             position: absolute;
@@ -94,34 +126,41 @@
         }
 
         @keyframes scrollGround {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50px); }
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50px);
+            }
         }
 
         #player {
             position: absolute;
             bottom: 60px;
             left: 50px;
-            font-size: 4em;
+            font-size: 5.2em;
             animation: runStep 0.4s steps(2) infinite;
             z-index: 5;
         }
 
         @keyframes runStep {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-10px);
+            }
         }
 
-        #player.walking {
-            animation: none;
-            transition: left 2s steps(20) linear;
-        }
+
 
         #goal-flag {
             position: absolute;
             bottom: 60px;
             right: 50px;
-            font-size: 4em;
+            font-size: 5.2em;
             display: none;
             z-index: 4;
         }
@@ -130,7 +169,7 @@
             position: absolute;
             bottom: 60px;
             right: -100px;
-            font-size: 3.5em;
+            font-size: 4.5em;
             z-index: 4;
         }
 
@@ -138,21 +177,25 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: var(--famicom-cream);
-            z-index: 20;
+            z-index: 200;
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
         }
 
-        .hidden { display: none !important; }
+        .hidden {
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
 
         h1 {
             margin: 0 0 20px 0;
@@ -172,7 +215,7 @@
             background-color: var(--famicom-red);
             color: var(--famicom-cream);
             /* Pixel border */
-            box-shadow: 
+            box-shadow:
                 0 -4px 0 0 var(--famicom-black),
                 0 4px 0 0 var(--famicom-black),
                 -4px 0 0 0 var(--famicom-black),
@@ -190,7 +233,7 @@
 
         button:hover {
             transform: translate(-2px, -2px);
-            box-shadow: 
+            box-shadow:
                 0 -4px 0 0 var(--famicom-black),
                 0 4px 0 0 var(--famicom-black),
                 -4px 0 0 0 var(--famicom-black),
@@ -204,29 +247,32 @@
             box-shadow: 0px 0px 0px var(--famicom-black);
         }
 
-        #quiz-modal {
+        #quiz-modal,
+        #explanation-modal {
             background: var(--famicom-cream);
             /* Pixel border */
-            box-shadow: 
+            box-shadow:
                 0 -4px 0 0 var(--famicom-black),
                 0 4px 0 0 var(--famicom-black),
                 -4px 0 0 0 var(--famicom-black),
                 4px 0 0 0 var(--famicom-black),
                 8px 8px 0px 0px var(--famicom-black);
             color: var(--famicom-black);
-            padding: 30px;
+            padding: 20px 25px;
             width: 85%;
             max-width: 500px;
+            max-height: 90%;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         #question-text {
-            font-size: 1.25em;
+            font-size: 1.15em;
             font-weight: bold;
-            margin-bottom: 20px;
-            line-height: 1.6;
+            margin-bottom: 15px;
+            line-height: 1.5;
         }
 
         .ox-container {
@@ -246,8 +292,13 @@
             box-shadow: 4px 4px 0px var(--famicom-black);
         }
 
-        .btn-o { background-color: var(--color-o); }
-        .btn-x { background-color: var(--color-x); }
+        .btn-o {
+            background-color: var(--color-o);
+        }
+
+        .btn-x {
+            background-color: var(--color-x);
+        }
 
         #hint-btn {
             margin-top: 15px;
@@ -261,10 +312,108 @@
         #hint-text {
             margin-top: 10px;
             font-size: 0.9em;
+            font-weight: bold;
             background: #FDF5E6;
             padding: 8px;
             border: 2px dashed var(--famicom-black);
             display: none;
+        }
+
+        .mc-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .mc-btn {
+            background-color: var(--famicom-cream);
+            color: var(--famicom-black);
+            font-size: 1.0em;
+            font-weight: bold;
+            padding: 10px;
+            border: 3px solid var(--famicom-black);
+            box-shadow: 3px 3px 0px var(--famicom-black);
+            text-align: left;
+            cursor: pointer;
+            word-break: keep-all;
+        }
+
+        .mc-btn:hover {
+            background-color: #E8D0B0;
+            transform: translate(-1px, -1px);
+        }
+
+        .mc-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--famicom-black);
+        }
+
+        .bg-farm {
+            background-color: #87CEEB !important;
+            background-image:
+                radial-gradient(circle at 20% 30%, #FFD700 30px, transparent 31px),
+                repeating-linear-gradient(90deg,
+                    transparent 0, transparent 80px, rgba(255, 255, 255, 0.8) 80px, rgba(255, 255, 255, 0.8) 120px, transparent 120px, transparent 200px),
+                linear-gradient(to bottom, #87CEEB, #e0f6ff) !important;
+            background-size: 100% 100%, 300px 80px, 100% 100% !important;
+            background-position: 0 0, 0 40px, 0 0 !important;
+            background-repeat: no-repeat, repeat-x, no-repeat !important;
+        }
+
+        .bg-rainy-city {
+            background-color: #2b2b36 !important;
+            background-image:
+                linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0.8) 42%, transparent 44%),
+                repeating-linear-gradient(105deg, transparent 0, transparent 10px, rgba(255, 255, 255, 0.2) 10px, rgba(255, 255, 255, 0.2) 11px),
+                linear-gradient(0deg, #1a1a24 0px, #1a1a24 150px, transparent 150px),
+                repeating-linear-gradient(90deg,
+                    #2a2a35 0px, #2a2a35 40px, transparent 40px, transparent 50px,
+                    #1d1d29 50px, #1d1d29 100px, transparent 100px, transparent 120px),
+                linear-gradient(to bottom, #111115, #333344) !important;
+            background-size: 100% 100%, 100% 100%, 100% 100%, 200px 250px, 100% 100% !important;
+            background-position: center, 0 0, bottom, bottom, bottom !important;
+            background-repeat: no-repeat, repeat, no-repeat, repeat-x, no-repeat !important;
+        }
+
+        .bg-desert {
+            background-color: #ffcc66 !important;
+            background-image:
+                radial-gradient(circle at 50% 50%, #FF4500 50px, transparent 55px),
+                radial-gradient(circle at 50% 100%, #e6a845 200px, transparent 200px),
+                radial-gradient(circle at 20% 100%, #d89634 150px, transparent 150px),
+                linear-gradient(to bottom, #ff9933, #ffcc66) !important;
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+            background-position: 0 0, bottom center, bottom left, 0 0 !important;
+            background-repeat: no-repeat !important;
+        }
+
+        .bg-battlefield {
+            background-color: #4a0e0e !important;
+            background-image:
+                radial-gradient(circle at 70% 40%, #ff4d4d 40px, transparent 60px),
+                repeating-linear-gradient(45deg,
+                    transparent 0, transparent 40px, rgba(30, 30, 30, 0.6) 40px, rgba(30, 30, 30, 0.6) 80px),
+                repeating-radial-gradient(circle at 20% 80%, rgba(50, 50, 50, 0.8) 0, rgba(50, 50, 50, 0.8) 30px, transparent 30px, transparent 60px),
+                linear-gradient(to bottom, #2a0808, #5a2513) !important;
+            background-size: 100% 100%, 100% 100%, 200px 200px, 100% 100% !important;
+            background-position: center, center, bottom left, center !important;
+            background-repeat: no-repeat, repeat, repeat-x, no-repeat !important;
+        }
+
+        .bg-bright-city {
+            background-color: #a0d8ef !important;
+            background-image:
+                radial-gradient(circle at 80% 20%, #ffffff 30px, transparent 31px),
+                linear-gradient(0deg, #8ba8b8 0px, #8ba8b8 150px, transparent 150px),
+                repeating-linear-gradient(90deg,
+                    #b0c4de 0px, #b0c4de 40px, transparent 40px, transparent 50px,
+                    #9fb6cd 50px, #9fb6cd 100px, transparent 100px, transparent 120px),
+                linear-gradient(to bottom, #6cb2d1, #a0d8ef) !important;
+            background-size: 100% 100%, 100% 100%, 200px 250px, 100% 100% !important;
+            background-position: 0 0, bottom, bottom, bottom !important;
+            background-repeat: no-repeat, no-repeat, repeat-x, no-repeat !important;
         }
 
         #feedback-overlay {
@@ -280,12 +429,25 @@
         }
 
         @keyframes pixelPop {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
         }
 
-        .anim-pop { animation: pixelPop 0.6s steps(4) forwards; }
+        .anim-pop {
+            animation: pixelPop 0.6s steps(4) forwards;
+        }
 
         .mark-o {
             color: var(--color-o);
@@ -300,7 +462,7 @@
 <body>
     <div id="game-container">
         <div id="hud">
-            <div class="hearts" id="heart-display">❤️❤️</div>
+            <div class="hearts" id="heart-display">❤️❤️❤️</div>
             <div class="progress-text">STAGE <span id="level-display">1</span> / 5</div>
         </div>
         <div id="ground"></div>
@@ -314,30 +476,70 @@
             <p>
                 <b>OX 퀴즈 챌린지!</b><br><br>🐱 <b>밥캣</b>을(를) 도와 하도급법 위반 위험을 물리치세요!<br>
                 ⭕❌ <b>OX 퀴즈</b>를 풀어야 합니다.<br>
-                ❤️ <b>하트 2개</b>로 시작합니다.<br>
-                🚩 <b>5문제</b>를 맞추면 승리!
+                ❤️ <b>하트 3개</b>로 시작합니다.<br>
+                🚩 <b>5문제</b>를 맞추면 승리!<br><br>
+                <span style="color: #ffeb3b; font-size: 0.9em; text-shadow: 1px 1px 1px black;">※ 모바일의 경우 <b>크롬(Chrome)</b> 또는 <b>엣지(Edge)</b> 브라우저에서 실행해 주세요.</span>
             </p>
-            <button onclick="startGame()">RUN START! 🐱</button>
+            <div
+                style="margin-bottom: 20px; text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border: 2px solid var(--famicom-gold);">
+                <div style="margin-bottom: 10px;">
+                    <label
+                        style="display:inline-block; width: 60px; font-weight:bold; color: var(--famicom-gold);">성명:</label>
+                    <input type="text" id="user-name" placeholder="김밥캣"
+                        style="padding: 5px; font-family: inherit; width: 150px; font-weight: bold;"
+                        onkeypress="if(event.key === 'Enter') startGame();">
+                </div>
+                <div>
+                    <label
+                        style="display:inline-block; width: 60px; font-weight:bold; color: var(--famicom-gold);">부서명:</label>
+                    <input type="text" id="user-dept" placeholder="호드"
+                        style="padding: 5px; font-family: inherit; width: 150px; font-weight: bold;"
+                        onkeypress="if(event.key === 'Enter') startGame();">
+                </div>
+                <div id="start-error" style="color: #ff4d4d; font-weight: bold; margin-top: 10px; font-size: 0.9em; text-align: center; display: none;">
+                    성명과 부서명을 모두 입력해 주세요!
+                </div>
+            <button type="button" onclick="startGame()" ontouchstart="startGame()" style="cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; z-index: 9999;">RUN START! 🐱</button>
+            </div>
         </div>
 
         <div id="quiz-screen" class="overlay hidden">
             <div id="quiz-modal">
                 <div id="question-text">Q. 질문이 여기에 나옵니다.</div>
-                <div class="ox-container">
+                <div id="ox-container" class="ox-container">
                     <button class="ox-btn btn-o" onclick="handleAnswer('O')">O</button>
                     <button class="ox-btn btn-x" onclick="handleAnswer('X')">X</button>
+                </div>
+                <div id="mc-container" class="mc-container" style="display:none;">
+                    <button class="mc-btn"></button>
+                    <button class="mc-btn"></button>
+                    <button class="mc-btn"></button>
+                    <button class="mc-btn"></button>
                 </div>
                 <button id="hint-btn" onclick="showHint()">💡 힌트 보기</button>
                 <div id="hint-text"></div>
             </div>
         </div>
 
+        <div id="explanation-screen" class="overlay hidden">
+            <div id="explanation-modal">
+                <h2 id="explanation-title"
+                    style="margin: 0 0 15px 0; font-size: 2em; text-shadow: 1px 1px 0px var(--famicom-black);">정답입니다!
+                    🙆‍♂️</h2>
+                <p id="explanation-text"
+                    style="font-size: 1.1em; line-height: 1.5; margin-bottom: 25px; font-weight: bold; word-break: keep-all;">
+                    여기에 설명이 들어갑니다.</p>
+                <button onclick="closeExplanation()" style="background-color: #4CAF50;">다음 ➡️</button>
+            </div>
+        </div>
+
         <div id="win-screen" class="overlay hidden">
-            <h1>🎉 MISSION CLEAR! 🎉</h1>
-            <p>모든 위협을 물리쳤습니다!<br>밥캣의 승리!</p>
-            <p id="final-stats">남은 하트: ❤️❤️</p>
+            <h1 style="margin-bottom: 10px;">🎉 MISSION CLEAR! 🎉</h1>
+            <p style="margin-bottom: 5px;">모든 위험을 물리쳤습니다!<br>밥캣의 승리!</p>
+            <p id="final-stats" style="margin-bottom: 15px;">남은 하트: ❤️❤️❤️</p>
+
             <button onclick="sendEmail()">📧 컴플라이언스 퀴즈 상품 응모하기</button>
-            <button onclick="location.reload()" style="margin-top: 15px; background-color: #4CAF50;">🔄 다시 도전하기</button>
+            <button onclick="location.reload()" style="margin-top: 10px; background-color: #4CAF50;">🔄 다시 도전하기</button>
         </div>
 
         <div id="lose-screen" class="overlay hidden">
@@ -348,73 +550,154 @@
         </div>
     </div>
 
+
     <script>
-        const MAX_HEARTS = 2;
+
+        const MAX_HEARTS = 3;
         const TOTAL_STAGES = 5;
-        let hearts = 2;
+        let hearts = 3;
         let currentStage = 1;
         let isRunning = false;
         let animationFrameId;
+        let userName = "";
+        let userDept = "";
         let enemyPosition = 900;
         let currentQuestion = null;
-        let usedQuestionIndices = [];
+        let normalQueue = [];
+        let nightmareQueue = [];
+        let hellQueue = [];
+        let currentStageQueue = [];
+        let masterQueue = [];
+
+        const playerEl = document.getElementById('player');
+        const enemyEl = document.getElementById('enemy');
+        const goalFlag = document.getElementById('goal-flag');
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const explanationScreen = document.getElementById('explanation-screen');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
+        const groundEl = document.getElementById('ground');
+        const winScreen = document.getElementById('win-screen');
+        const loseScreen = document.getElementById('lose-screen');
 
         const heartDisplay = document.getElementById('heart-display');
         const levelDisplay = document.getElementById('level-display');
-        const playerEl = document.getElementById('player');
-        const enemyEl = document.getElementById('enemy');
-        const groundEl = document.getElementById('ground');
-        const feedbackOverlay = document.getElementById('feedback-overlay');
-        const quizScreen = document.getElementById('quiz-screen');
-        const startScreen = document.getElementById('start-screen');
-        const winScreen = document.getElementById('win-screen');
-        const loseScreen = document.getElementById('lose-screen');
-        const goalFlag = document.getElementById('goal-flag');
-
         const questionBank = [
-            { q: "원사업자는 수급사업자에게 제조 등의 위탁을 할 때 반드시 서면을 발급해야 한다.", a: "O", hint: "사전에 서면을 발급하지 않는 것은 대표적인 하도급법 위반입니다." },
-            { q: "수급사업자의 귀책사유 없이 부당하게 발주를 취소하는 것은 하도급법 위반이다.", a: "O", hint: "일방적인 위탁 취소는 금지됩니다." },
-            { q: "하도급대금은 법정 지급기일과 상관없이 합의만 하면 언제든 지급해도 된다.", a: "X", hint: "목적물 수령일로부터 60일 이내에 지급해야 합니다." },
-            { q: "원사업자가 불황을 이유로 정당한 사유 없이 하도급대금을 감액하는 것은 허용된다.", a: "X", hint: "정당한 사유 없는 감액은 불법입니다." },
-            { q: "수급사업자가 기술자료 제공을 거부하면 거래를 끊어도 된다.", a: "X", hint: "기술자료 제공 강요는 금지되어 있습니다." },
-            { q: "하도급법은 대기업과 중소기업 간의 거래에만 적용된다.", a: "X", hint: "요건을 충족하면 중견기업이나 일부 중소기업 간 거래에도 적용됩니다." },
-            { q: "원재료 가격이 급등하면 수급사업자는 하도급대금 조정을 신청할 수 있다.", a: "O", hint: "납품대금 연동제 등이 시행되고 있습니다." },
-            { q: "발주자는 하도급대금을 수급사업자에게 직접 지급할 수 있는 경우가 있다.", a: "O", hint: "발주자 직불 사유 발생 시 직접 지급이 가능합니다." },
-            { q: "부당한 반품은 하도급법에서 금지하는 불공정 행위이다.", a: "O", hint: "수급사업자의 귀책사유 없는 반품은 금지됩니다." },
-            { q: "원사업자는 수급사업자의 의사에 반하여 물품 구매를 강제할 수 있다.", a: "X", hint: "정당한 사유 없는 물품 구매 강제는 불법입니다." },
-            { q: "하도급대금을 목적물 수령일로부터 60일을 초과하여 지급할 경우 지연이자가 발생한다.", a: "O", hint: "연 15.5%의 지연이자가 발생합니다." },
-            { q: "서면 발급은 공사나 제조가 끝난 후에 해도 무방하다.", a: "X", hint: "원칙적으로 착수 전에 발급해야 합니다." },
-            { q: "상대방의 동의가 있다면 하도급대금을 물품으로 지급해도 된다.", a: "X", hint: "강제로 물품 지급(대물변제)은 금지됩니다." },
-            { q: "표준하도급계약서 사용은 법적으로 의무화되어 있다.", a: "X", hint: "권장 사항 있으며, 사용 시 벌점 감경 등의 혜택이 있습니다." },
-            { q: "경쟁 입찰 시 최저가 입찰 금액보다 낮은 금액으로 하도급대금을 결정하는 것은 불법이다.", a: "O", hint: "부당한 하도급대금 결정 행위입니다." },
-            { q: "수급사업자는 원사업자의 승낙 없이 재위탁을 할 수 있다.", a: "X", hint: "재하도급은 원사업자의 승낙이 필요합니다." },
-            { q: "하도급 분쟁 조정 신청은 시효 중단의 효력이 있다.", a: "O", hint: "조정 신청 시점부터 시효가 중단됩니다." },
-            { q: "공정위는 상습적인 하도급법 위반 사업자의 명단을 공표할 수 있다.", a: "O", hint: "벌점 누적 시 명단 공표 대상이 됩니다." },
-            { q: "원사업자는 정당한 사유 없이 수급사업자에게 전속 거래를 강요해서는 안 된다.", a: "O", hint: "기술 등을 다른 사업자와 거래하지 못하게 하는 것은 불법입니다." },
-            { q: "구두로만 계약한 경우 수급사업자는 계약 내용을 입증할 방법이 전혀 없다.", a: "X", hint: "계약 추정 제도를 통해 내용증명 등으로 입증 기회가 있습니다." },
-            { q: "하도급대금을 감액하려면 감액 사유와 기준을 적은 서면을 미리 줘야 한다.", a: "O", hint: "서면 없이 감액하는 것은 절차적 위반입니다." },
-            { q: "원재료 가격이 하락하면 원사업자는 하도급대금 감액을 요구할 수 있다.", a: "O", hint: "공급원가 변동 시 양 당사자 모두 조정 신청이 가능합니다." },
-            { q: "기술자료 유용 행위는 징벌적 손해배상(3배) 대상이다.", a: "O", hint: "악의적인 위반 행위로 간주됩니다." },
-            { q: "부당한 반품 행위는 징벌적 손해배상 대상이 아니다.", a: "X", hint: "부당 반품, 부당 감액 등은 징벌적 손해배상 대상입니다." },
-            { q: "수급사업자가 관세 환급금을 받는 것은 원천적으로 금지된다.", a: "X", hint: "수출용 원재료에 대한 관세 환급금은 정당하게 받아야 합니다." },
-            { q: "발주자로부터 설계 변경으로 증액을 받은 경우, 30일 이내에 수급사업자에게 대금을 증액해줘야 한다.", a: "O", hint: "받은 날로부터 30일 이내입니다." },
-            { q: "설계 변경 증액 내용은 발주자로부터 받은 날로부터 15일 이내에 통지해야 한다.", a: "O", hint: "15일 이내 통지 의무가 있습니다." },
-            { q: "건설 공사 기간이 연장되어도 추가 비용은 지급할 필요가 없다.", a: "X", hint: "기간 연장에 따른 추가 비용도 지급해야 합니다." },
-            { q: "발주자가 인건비를 직접 수급사업자에게 주기로 합의하면 원사업자의 지급 의무는 면제된다.", a: "O", hint: "직불 합의 시 원사업자의 의무는 소멸합니다." },
-            { q: "하도급법 위반 조사는 거래 종료일로부터 3년이 지나면 개시할 수 없다.", a: "O", hint: "조사 시효는 원칙적으로 3년입니다." }
+            // Normal - OX (Stages 1, 2)
+            { difficulty: "normal_ox", q: "원사업자는 수급사업자에게 제조 등의 위탁을 할 때 반드시 서면을 발급해야 한다.", a: "O", hint: "사전에 서면을 발급하지 않는 것은 대표적인 하도급법 위반입니다." },
+            { difficulty: "normal_ox", q: "수급사업자의 귀책사유 없이 부당하게 발주를 취소하는 것은 하도급법 위반이다.", a: "O", hint: "일방적인 위탁 취소는 금지됩니다." },
+            { difficulty: "normal_ox", q: "하도급대금은 법정 지급기일과 상관없이 합의만 하면 언제든 지급해도 된다.", a: "X", hint: "목적물 수령일로부터 60일 이내에 지급해야 합니다." },
+            { difficulty: "normal_ox", q: "원사업자가 불황을 이유로 정당한 사유 없이 하도급대금을 감액하는 것은 허용된다.", a: "X", hint: "정당한 사유 없는 감액은 불법입니다." },
+            { difficulty: "normal_ox", q: "수급사업자가 기술자료 제공을 거부하면 거래를 끊어도 된다.", a: "X", hint: "기술자료 제공 강요는 금지되어 있습니다." },
+            { difficulty: "normal_ox", q: "원재료 가격이 급등하면 수급사업자는 하도급대금 조정을 신청할 수 있다.", a: "O", hint: "납품대금 연동제 및 공급원가 변동에 따른 대금 조정 신청 제도 이용 가능" },
+            { difficulty: "normal_ox", q: "발주자는 하도급대금을 수급사업자에게 직접 지급할 수 있는 경우가 있다.", a: "O", hint: "발주자 직불 사유 발생 시 직접 지급이 가능합니다." },
+            { difficulty: "normal_ox", q: "부당한 반품은 하도급법에서 금지하는 불공정 행위이다.", a: "O", hint: "수급사업자의 귀책사유 없는 반품은 금지됩니다." },
+            { difficulty: "normal_ox", q: "원사업자는 수급사업자의 의사에 반하여 물품 구매를 강제할 수 있다.", a: "X", hint: "정당한 사유 없는 물품 구매 강제는 불법입니다." },
+            { difficulty: "normal_ox", q: "서면 발급은 공사나 제조가 끝난 후에 해도 무방하다.", a: "X", hint: "원칙적으로 착수 전에 발급해야 합니다." },
+            { difficulty: "normal_ox", q: "하도급계약의 중요 사항을 변경할 때도 반드시 서면을 발급해야 한다.", a: "O", hint: "변경 계약 시에도 서면 발급은 필수입니다." },
+            { difficulty: "normal_ox", q: "원사업자는 수급사업자의 이익을 부당하게 침해하는 특약을 설정할 수 있다.", a: "X", hint: "수급사업자의 권리를 제한하는 부당 특약은 금지됩니다." },
+            { difficulty: "normal_ox", q: "목적물을 수령한 날로부터 10일 이내에 검사 결과를 통지해야 한다.", a: "O", hint: "법정 검사 통지 기한은 10일입니다." },
+            { difficulty: "normal_ox", q: "원사업자가 발주자로부터 대금을 어음으로 받았다면 수급사업자에게도 어음으로 줄 수 있다.", a: "O", hint: "받은 결제 수단과 동일하거나 더 좋은 수단으로 지급해야 합니다." },
+            { difficulty: "normal_ox", q: "정당한 사유가 있다면 하도급대금을 60일 이후에 지급해도 이자가 붙지 않는다.", a: "X", hint: "60일을 초과하면 예외 없이 지연이자가 발생합니다." },
+            { difficulty: "normal_ox", q: "원사업자는 수급사업자에게 자사 제품을 강제로 구매하게 할 수 없다.", a: "O", hint: "물품 구매 강제 행위는 하도급법 위반입니다." },
+            { difficulty: "normal_ox", q: "수급사업자가 잘못을 한 경우 서면 없이 즉시 하도급대금을 감액할 수 있다.", a: "X", hint: "감액 시에는 반드시 사전에 사유를 적은 서면을 주어야 합니다." },
+            { difficulty: "normal_ox", q: "발주자가 대금을 직접 지급하기로 합의했다면 원사업자의 지급 의무는 사라진다.", a: "O", hint: "직불 합의된 범위 내에서 원사업자의 의무는 소멸합니다." },
+            { difficulty: "normal_ox", q: "하도급법은 오직 국내 기업 간의 거래에만 적용된다.", a: "X", hint: "국외 행위라도 국내 시장에 영향을 미치면 적용될 수 있습니다." },
+            { difficulty: "normal_ox", q: "원사업자가 수급사업자의 기술자료를 제3자에게 유출하는 것은 불법이다.", a: "O", hint: "기술자료의 유출 및 유용은 엄격히 금지됩니다." },
+
+            // Normal - 2MC (Stage 3)
+            { difficulty: "normal_2mc", q: "하도급계약 체결 시 서면을 발급해야 하는 시점은?", choices: ["작업 착수 전", "납품 완료 후"], a: 0, hint: "반드시 사전에 서면을 교부해야 합니다." },
+            { difficulty: "normal_2mc", q: "다음 중 하도급대금 지급 기일로 옳은 것은?", choices: ["수령일로부터 60일 이내", "수령일로부터 90일 이내"], a: 0, hint: "법정 지급 기일은 60일 이내입니다." },
+            { difficulty: "normal_2mc", q: "원사업자가 수급사업자에게 정당한 사유 없이 기술자료를 요구하는 것은?", choices: ["허용된다", "금지된다"], a: 1, hint: "기술자료 요구는 엄격히 제한됩니다." },
+            { difficulty: "normal_2mc", q: "하도급대금을 60일 초과하여 지급할 때 발생하는 지연이자의 이율은?", choices: ["연 15.5%", "연 5.0%"], a: 0, hint: "연 15.5%의 높은 지연이자가 발생합니다." },
+            { difficulty: "normal_2mc", q: "부당하게 하도급대금을 결정하거나 감액한 경우 배상액은?", choices: ["손해액의 최대 3배", "손해액과 동일"], a: 0, hint: "징벌적 손해배상 제도가 적용됩니다." },
+            { difficulty: "normal_2mc", q: "수급사업자가 하도급법 위반을 신고했다는 이유로 보복하는 행위는?", choices: ["금지된다", "합법이다"], a: 0, hint: "보복 조치는 가장 엄중히 처벌받습니다." },
+            { difficulty: "normal_2mc", q: "표준하도급계약서 사용은 법적으로?", choices: ["권장 사항이다", "의무 사항이다"], a: 0, hint: "의무는 아니나 사용 시 혜택이 있습니다." },
+            { difficulty: "normal_2mc", q: "하도급거래에 관한 서류 보존 의무 기간은?", choices: ["거래 종료 후 3년", "거래 종료 후 1년"], a: 0, hint: "원칙적으로 3년간 보존해야 합니다." },
+            { difficulty: "normal_2mc", q: "건설 하도급에서 대금 지급 보증은?", choices: ["의무 사항이다", "선택 사항이다"], a: 0, hint: "건설 분야는 대금 지급 보증이 필수입니다." },
+            { difficulty: "normal_2mc", q: "발주자가 원사업자의 파산 등을 이유로 대금을 수급사업자에게 주는 것은?", choices: ["가능하다", "불가능하다"], a: 0, hint: "요건 하에 발주자 직불이 가능합니다." },
+
+            // Nightmare - 3MC (Stage 4)
+            { difficulty: "nightmare_3mc", q: "하도급법상 '기술자료'에 해당하지 않는 것은?", choices: ["설계도면 및 제조방법", "특허권 등 지적재산권", "회사의 일반적인 주소록"], a: 2, hint: "비밀로 관리되는 기술적/경영적 정보여야 합니다." },
+            { difficulty: "nightmare_3mc", q: "다음 중 하도급대금의 '부당한 감액'에 해당하는 경우는?", choices: ["합의 하에 단가 인하", "경영 적자를 이유로 일방 감액", "목적물 하자로 인한 대금 공제"], a: 1, hint: "일방적인 경영상 이유로 감액하는 것은 불법입니다." },
+            { difficulty: "nightmare_3mc", q: "어음 결제 시 '어음할인료'를 지급해야 하는 기준일은?", choices: ["수령일로부터 15일 초과", "수령일로부터 30일 초과", "수령일로부터 60일 초과"], a: 2, hint: "60일을 초과하는 기간에 대한 할인료를 줘야 합니다." },
+            { difficulty: "nightmare_3mc", q: "정당한 사유 없이 특정인을 선임하도록 강요하는 행위는?", choices: ["부당한 경영간섭", "부당한 이익취득", "정당한 권리행사"], a: 0, hint: "인사권에 개입하는 것은 경영간섭에 해당합니다." },
+            { difficulty: "nightmare_3mc", q: "설계 변경으로 대금을 증액받은 후 수급사업자에게 알려야 하는 기한은?", choices: ["10일 이내", "15일 이내", "30일 이내"], a: 1, hint: "15일 이내에 반드시 통지해야 합니다." },
+            { difficulty: "nightmare_3mc", q: "경쟁 입찰 시 하도급대금을 '부당하게 결정'했다고 보는 기준은?", choices: ["시장가보다 낮은 경우", "최저가보다 낮게 결정한 경우", "예산 범위를 초과한 경우"], a: 1, hint: "정당한 사유 없이 최저가보다 낮게 결정하면 위법입니다." },
+            { difficulty: "nightmare_3mc", q: "물품 검사 결과를 통지해야 하는 법정 기한은?", choices: ["수령일로부터 5일 이내", "수령일로부터 10일 이내", "수령일로부터 20일 이내"], a: 1, hint: "10일 이내에 통지하지 않으면 합격으로 간주합니다." },
+            { difficulty: "nightmare_3mc", q: "다음 중 징벌적 손해배상(최대 3배) 대상이 아닌 행위는?", choices: ["기술자료 유용 행위", "부당한 위탁취소 행위", "지연이자 미지급 행위"], a: 2, hint: "지연이자 미지급은 징벌적 배상 대상은 아닙니다." },
+            { difficulty: "nightmare_3mc", q: "원사업자가 계열사를 위해 부당하게 협찬금을 요구하는 행위는?", choices: ["부당한 경제적 이익 요구", "정당한 마케팅 활동", "경영 간섭"], a: 0, hint: "정당한 사유 없는 경제적 이익 요구는 금지됩니다." },
+            { difficulty: "nightmare_3mc", q: "하도급계약 체결 전 교섭단계에서 받은 기술자료는?", choices: ["보호 대상이 아니다", "하도급법 보호 대상이다", "민법으로만 보호된다"], a: 1, hint: "교섭 단계의 자료도 하도급법 보호를 받습니다." },
+
+            // Hell - 4MC (Stage 5)
+            { difficulty: "hell", q: "하도급대금 지급 기일로 가장 올바른 것은?", choices: ["목적물 수령일로부터 30일 이내", "목적물 수령일로부터 60일 이내", "위탁일로부터 60일 이내", "세금계산서 발행일로부터 60일 이내"], a: 1, hint: "원칙적으로 목적물 등 수령일로부터 60일 이내에 하도급대금을 지급해야 합니다." },
+            { difficulty: "hell", q: "원사업자가 수급사업자에게 제조 등의 위탁을 할 때, 계약 서면을 발급해야 하는 올바른 시기는?", choices: ["위탁에 따른 작업 착수 전", "납품을 완료한 후", "위탁 후 15일 이내", "대금을 지급할 때"], a: 0, hint: "서면은 반드시 수급사업자가 위탁에 따른 작업에 착수하기 전에 발급되어야 합니다." },
+            { difficulty: "hell", q: "하도급법상 원사업자가 정당한 사유 없이 요구해서는 안 되는 행위가 아닌 것은?", choices: ["자사 제품의 강제 구매", "경영 정보 제공 요구", "목적물 검사를 위한 협조 요청", "기술자료 제공 강요"], a: 2, hint: "목적물 검사를 위한 합리적인 협조 요청은 적법하며, 나머지는 금지된 행위입니다." },
+            { difficulty: "hell", q: "수급사업자가 하도급법 위반을 공정위에 신고한 경우, 취해서는 안 되는 조치로 알맞은 것은?", choices: ["적법한 목적물 검사 진행", "대금 지급 조건 완화", "신고를 이유로 한 수주 물량 축소", "상호 협의 하에 계약 갱신"], a: 2, hint: "신고 등을 이유로 수주 물량을 줄이거나 거래를 정지하는 등의 보복조치는 금지됩니다." },
+            { difficulty: "hell", q: "다음 중 하도급법에서 명시한 부당한 특약에 해당하지 않는 것은?", choices: ["수급사업자의 권리를 부당하게 제한하는 약정", "하자담보책임을 10년으로 연장하는 부당한 약정", "합의 하에 선급금을 조기 지급하는 약정", "수급사업자에게 모든 민원 처리 비용을 전가하는 약정"], a: 2, hint: "선급금을 조기 지급하는 것은 수급사업자에게 유리한 조건이므로 부당 특약이 아닙니다." },
+            { difficulty: "hell", q: "하도급법상 기술자료 유용행위 등에 대해 원사업자가 배상해야 할 징벌적 손해배상의 최대 한도는?", choices: ["손해액과 동일", "손해액의 2배 이내", "손해액의 3배 이내", "손해액의 5배 이내"], a: 2, hint: "부당위탁취소, 부당반품, 부당감액, 기술유용 등은 최대 3배까지의 징벌적 손해배상 대상입니다." },
+            { difficulty: "hell", q: "도급대금을 증액 받은 원사업자가 수급사업자에게 증액분을 지급해야 하는 법정 기한은?", choices: ["증액 받은 날부터 15일 이내", "증액 받은 날부터 30일 이내", "증액 받은 날부터 60일 이내", "다음 달 결제일 이내"], a: 1, hint: "하도급법 제16조에 따라 도급대금을 증액 받은 날부터 30일 이내에 증액하여 지급해야 합니다." },
+            { difficulty: "hell", q: "하도급대금을 어음으로 지급하는 경우, 어음 만기일은 원칙적으로 언제 이내여야 하는가?", choices: ["목적물 수령일로부터 60일 이내", "목적물 수령일로부터 90일 이내", "목적물 수령일로부터 120일 이내", "세금계산서 발행일로부터 60일 이내"], a: 0, hint: "어음 만기일은 목적물 등 수령일로부터 60일 이내여야 하며, 초과 시 어음할인료를 지급해야 합니다." },
+            { difficulty: "hell", q: "다음 중 부당한 하도급대금 결정 행위에 해당하는 것은?", choices: ["시장 가격 하락으로 합의하여 단가를 인하한 경우", "경쟁 입찰 시 최저가 입찰 금액보다 낮은 금액으로 대금을 결정한 경우", "원재료 가격 급등으로 대금을 인상한 경우", "물가 변동분을 반영하여 대금을 조정한 경우"], a: 1, hint: "정당한 사유 없이 최저가 입찰 금액보다 낮은 금액으로 대금을 결정하는 것은 불법입니다." },
+            { difficulty: "hell", q: "원사업자가 수급사업자에게 기술자료를 요구할 때, 반드시 지켜야 하는 필수 절차는?", choices: ["사전에 구두로 동의를 구함", "기술자료 요구서를 서면으로 교부함", "기술자료를 받은 후 영수증을 발급함", "제3자에게 기술 검증을 의뢰함"], a: 1, hint: "기술자료 요구 시에는 반드시 요구 목적, 비밀 유지 등에 관한 사항을 기재한 서면을 교부해야 합니다." }
         ];
 
+        function updateBackground() {
+            const container = document.getElementById('game-container');
+            container.classList.remove('bg-farm', 'bg-rainy-city', 'bg-desert', 'bg-battlefield', 'bg-bright-city');
+            if (currentStage === 1) {
+                container.classList.add('bg-farm');
+            } else if (currentStage === 2) {
+                container.classList.add('bg-rainy-city');
+            } else if (currentStage === 3) {
+                container.classList.add('bg-desert');
+            } else if (currentStage === 4) {
+                container.classList.add('bg-battlefield');
+            } else {
+                container.classList.add('bg-bright-city');
+            }
+        }
+
         function startGame() {
-            hearts = 2; currentStage = 1; enemyPosition = 900;
+            const nameInput = document.getElementById('user-name').value.trim();
+            const deptInput = document.getElementById('user-dept').value.trim();
+            const errorMsg = document.getElementById('start-error');
+            
+            if (!nameInput || !deptInput) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+            errorMsg.style.display = 'none';
+            userName = nameInput;
+            userDept = deptInput;
+
+            hearts = 3; currentStage = 1; enemyPosition = 900;
             playerEl.style.left = '50px'; playerEl.classList.remove('walking');
             goalFlag.style.display = 'none'; enemyEl.style.display = 'block';
+
+            // Pool Shuffle
+            const oxPool = questionBank.filter(q => q.difficulty === 'normal_ox').sort(() => 0.5 - Math.random());
+            const mc2Pool = questionBank.filter(q => q.difficulty === 'normal_2mc').sort(() => 0.5 - Math.random());
+            const mc3Pool = questionBank.filter(q => q.difficulty === 'nightmare_3mc').sort(() => 0.5 - Math.random());
+            const mc4Pool = questionBank.filter(q => q.difficulty === 'hell').sort(() => 0.5 - Math.random());
+
+            // Master Queue (5 Stages)
+            masterQueue = [
+                oxPool.shift(),   // Stage 1: OX
+                oxPool.shift(),   // Stage 2: OX
+                mc2Pool.shift(),  // Stage 3: 2-MC
+                mc3Pool.shift(),  // Stage 4: 3-MC
+                mc4Pool.shift()   // Stage 5: 4-MC
+            ];
+
+            updateBackground();
             updateHUD(); startScreen.classList.add('hidden');
             isRunning = true; gameLoop();
         }
 
         function updateHUD() {
             let str = "";
-            for (let i = 0; i < 2; i++) {
+            for (let i = 0; i < 3; i++) {
                 if (hearts >= i + 1) str += "❤️";
                 else if (hearts > i) str += "💔";
                 else str += "🤍";
@@ -440,11 +723,32 @@
         function pauseGame() { isRunning = false; cancelAnimationFrame(animationFrameId); }
 
         function triggerEncounter() {
-            let idx = Math.floor(Math.random() * questionBank.length);
-            currentQuestion = questionBank[idx];
+            currentQuestion = masterQueue[currentStage - 1];
+            if (!currentQuestion) return;
             quizScreen.classList.remove('hidden');
-            quizScreen.style.display = 'flex';
+
             document.getElementById('question-text').innerText = "Q" + currentStage + ". " + currentQuestion.q;
+
+            const oxContainer = document.getElementById('ox-container');
+            const mcContainer = document.getElementById('mc-container');
+            if (currentQuestion.choices) {
+                oxContainer.style.display = 'none';
+                mcContainer.style.display = 'flex';
+                const btns = mcContainer.querySelectorAll('.mc-btn');
+                btns.forEach((btn, idx) => {
+                    if (idx < currentQuestion.choices.length) {
+                        btn.innerText = (idx + 1) + ". " + currentQuestion.choices[idx];
+                        btn.style.display = 'block';
+                        btn.onclick = () => handleAnswer(idx);
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            } else {
+                oxContainer.style.display = 'flex';
+                mcContainer.style.display = 'none';
+            }
+
             document.getElementById('hint-text').style.display = 'none';
             document.getElementById('hint-btn').style.display = 'block';
         }
@@ -458,19 +762,44 @@
         function handleAnswer(choice) {
             const correct = (choice === currentQuestion.a);
             quizScreen.classList.add('hidden');
-            quizScreen.style.display = 'none';
             showFeedback(correct);
             setTimeout(() => {
-                if (correct) {
-                    hearts = Math.min(hearts + 0.5, 2);
-                    currentStage++;
-                    if (currentStage > 5) startVictorySequence(); else resumeGame();
-                } else {
-                    hearts -= 1;
-                    if (hearts <= 0) loseGame(); else resumeGame();
-                }
-                updateHUD();
+                showExplanation(correct);
             }, 1000);
+        }
+
+        function showExplanation(correct) {
+            const titleEl = document.getElementById('explanation-title');
+            if (correct) {
+                titleEl.innerText = "정답입니다! 🙆‍♂️";
+                titleEl.style.color = "var(--color-o)";
+            } else {
+                titleEl.innerText = "오답입니다... 🙅‍♂️";
+                titleEl.style.color = "var(--color-x)";
+            }
+            document.getElementById('explanation-text').innerText = currentQuestion.hint;
+            document.getElementById('explanation-screen').classList.remove('hidden');
+            document.getElementById('explanation-screen').dataset.correct = correct;
+        }
+
+        function closeExplanation() {
+            document.getElementById('explanation-screen').classList.add('hidden');
+            const correct = document.getElementById('explanation-screen').dataset.correct === "true";
+
+            if (correct) {
+                hearts = Math.min(hearts + 0.5, 3);
+                currentStage++;
+                if (currentStage > 5) {
+                    startVictorySequence();
+                } else {
+                    updateBackground();
+                    resumeGame();
+                }
+            } else {
+                hearts -= 1;
+                if (hearts <= 0) loseGame(); else resumeGame();
+            }
+            updateHUD();
         }
 
         function showFeedback(correct) {
@@ -486,28 +815,49 @@
             groundEl.style.animation = 'none';
             enemyEl.style.display = 'none';
             goalFlag.style.display = 'block';
+
             setTimeout(() => {
-                playerEl.classList.add('walking');
-                playerEl.style.left = (document.getElementById('game-container').offsetWidth - 150) + 'px';
-                setTimeout(() => { winGame(); }, 2600);
+                let currentLeft = parseInt(playerEl.style.left || '50', 10);
+                const targetLeft = document.getElementById('game-container').offsetWidth - 150;
+
+                const walkInterval = setInterval(() => {
+                    currentLeft += 4;
+                    if (currentLeft >= targetLeft) {
+                        currentLeft = targetLeft;
+                        clearInterval(walkInterval);
+                        setTimeout(() => { winGame(); }, 500);
+                    }
+                    playerEl.style.left = currentLeft + 'px';
+                }, 30);
             }, 500);
         }
 
         function resumeGame() { enemyPosition = 900; spawnEnemy(); isRunning = true; gameLoop(); }
+        let globalScoreCode = "";
+
+        function generateHashCode() {
+            const payload = userName + "|" + userDept;
+            // 한글 등 유니코드 처리를 위해 encodeURIComponent 적용 후 Base64 인코딩
+            return btoa(encodeURIComponent(payload));
+        }
+
         function winGame() {
             document.getElementById('final-stats').innerText = "남은 하트: " + heartDisplay.innerText;
+            globalScoreCode = generateHashCode();
             winScreen.classList.remove('hidden');
         }
         function loseGame() { loseScreen.classList.remove('hidden'); }
         function sendEmail() {
             const recipient = "bobcat.cp@doosan.com";
-            const subject = "[컴플라이언스 퀴즈] 상품 응모";
+            const subject = "[컴플라이언스 퀴즈] 상품 응모 - " + userName;
             let body = "이 메일은 두산밥캣 컴플라이언스 런을 완수하신 분들에게만 제공됩니다.\r\n";
-            body += "응모하신 분들 중 5명을 추첨하여 소정의 상품(Bobcat Miniature)를 제공할 예정입니다. 성명과 부서를 아래 입력 하시어 회신 하시면 응모가 완료 됩니다.\r\n\r\n";
-            body += " - 성명 : \r\n";
-            body += " - 부서 : \r\n\r\n";
-            body += "항상 두산밥캣의 Compliance 자율준수를 위해 노력해 주셔서 감사합니다.\r\n";
-            body += "Do the Right Things!";
+            body += "응모하신 분들 중 5명을 추첨하여 소정의 상품(온누리상품권 3만원)를 수여할 예정입니다. 아래 정보가 맞는지 확인 후 그대로 전송해 주세요.\r\n\r\n";
+            body += " - 성명 : " + userName + "\r\n";
+            body += " - 부서 : " + userDept + "\r\n\r\n";
+            body += "항상 두산밥캣의 공정거래 CP 자율준수를 위해 노력해 주셔서 감사합니다.\r\n";
+            body += "Do the Right Things!\r\n\r\n";
+            body += "==============================\r\n";
+            body += "증빙 코드 : " + globalScoreCode;
             window.location.href = "mailto:" + recipient + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
         }
     </script>

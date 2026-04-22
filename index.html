@@ -563,10 +563,10 @@
         let userDept = "";
         let enemyPosition = 900;
         let currentQuestion = null;
-        let normalQueue = [];
-        let nightmareQueue = [];
-        let hellQueue = [];
-        let currentStageQueue = [];
+        let globalOxPool = [];
+        let globalMc2Pool = [];
+        let globalMc3Pool = [];
+        let globalMc4Pool = [];
         let masterQueue = [];
 
         const playerEl = document.getElementById('player');
@@ -676,18 +676,18 @@
             goalFlag.style.display = 'none'; enemyEl.style.display = 'block';
 
             // Pool Shuffle
-            const oxPool = questionBank.filter(q => q.difficulty === 'normal_ox').sort(() => 0.5 - Math.random());
-            const mc2Pool = questionBank.filter(q => q.difficulty === 'normal_2mc').sort(() => 0.5 - Math.random());
-            const mc3Pool = questionBank.filter(q => q.difficulty === 'nightmare_3mc').sort(() => 0.5 - Math.random());
-            const mc4Pool = questionBank.filter(q => q.difficulty === 'hell').sort(() => 0.5 - Math.random());
+            globalOxPool = questionBank.filter(q => q.difficulty === 'normal_ox').sort(() => 0.5 - Math.random());
+            globalMc2Pool = questionBank.filter(q => q.difficulty === 'normal_2mc').sort(() => 0.5 - Math.random());
+            globalMc3Pool = questionBank.filter(q => q.difficulty === 'nightmare_3mc').sort(() => 0.5 - Math.random());
+            globalMc4Pool = questionBank.filter(q => q.difficulty === 'hell').sort(() => 0.5 - Math.random());
 
             // Master Queue (5 Stages)
             masterQueue = [
-                oxPool.shift(),   // Stage 1: OX
-                oxPool.shift(),   // Stage 2: OX
-                mc2Pool.shift(),  // Stage 3: 2-MC
-                mc3Pool.shift(),  // Stage 4: 3-MC
-                mc4Pool.shift()   // Stage 5: 4-MC
+                globalOxPool.shift(),   // Stage 1: OX
+                globalOxPool.shift(),   // Stage 2: OX
+                globalMc2Pool.shift(),  // Stage 3: 2-MC
+                globalMc3Pool.shift(),  // Stage 4: 3-MC
+                globalMc4Pool.shift()   // Stage 5: 4-MC
             ];
 
             updateBackground();
@@ -797,7 +797,21 @@
                 }
             } else {
                 hearts -= 1;
-                if (hearts <= 0) loseGame(); else resumeGame();
+                if (hearts <= 0) {
+                    loseGame();
+                } else {
+                    // 틀린 문제는 다시 나오지 않도록 같은 난이도의 새 문제로 교체
+                    if (currentStage === 1 || currentStage === 2) {
+                        masterQueue[currentStage - 1] = globalOxPool.shift() || masterQueue[currentStage - 1];
+                    } else if (currentStage === 3) {
+                        masterQueue[currentStage - 1] = globalMc2Pool.shift() || masterQueue[currentStage - 1];
+                    } else if (currentStage === 4) {
+                        masterQueue[currentStage - 1] = globalMc3Pool.shift() || masterQueue[currentStage - 1];
+                    } else if (currentStage === 5) {
+                        masterQueue[currentStage - 1] = globalMc4Pool.shift() || masterQueue[currentStage - 1];
+                    }
+                    resumeGame();
+                }
             }
             updateHUD();
         }

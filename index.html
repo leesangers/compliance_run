@@ -556,10 +556,16 @@
         <div id="win-screen" class="overlay hidden">
             <h1 style="margin-bottom: 10px;">🎉 MISSION CLEAR! 🎉</h1>
             <p style="margin-bottom: 5px;">모든 위험을 물리쳤습니다!<br>밥캣의 승리!</p>
-            <p id="final-stats" style="margin-bottom: 15px;">남은 하트: ❤️❤️❤️</p>
+            <p id="final-stats" style="margin-bottom: 5px;">남은 하트: ❤️❤️❤️</p>
+            <p id="user-info-display" style="margin-bottom: 2px; font-size: 0.9em; font-weight: bold;"></p>
+            <p id="cert-code-display" style="margin-bottom: 15px; font-size: 0.75em; color: var(--famicom-gold); word-break: break-all; opacity: 0.8;"></p>
 
-            <button onclick="sendEmail()">📧 컴플라이언스 퀴즈 상품 응모하기</button>
-            <button onclick="location.reload()" style="margin-top: 10px; background-color: #4CAF50;">🔄 다시 도전하기</button>
+            <button onclick="sendEmail()" style="background-color: #E91E63; font-size: 1.2em; padding: 15px 35px;">📧 상품 응모 메일 보내기</button>
+            <div style="margin-top: 15px; font-size: 0.85em; color: #ffeb3b; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px; border: 1px dashed #ffeb3b; max-width: 400px;">
+                💡 메일창이 뜨지 않는다면? <br>
+                <b>이 화면을 캡쳐</b>하여 <b>bobcat.cp@doosan.com</b>으로 보내주세요.
+            </div>
+            <button onclick="location.reload()" style="margin-top: 20px; background-color: #4CAF50;">🔄 다시 도전하기</button>
         </div>
 
         <div id="lose-screen" class="overlay hidden">
@@ -1251,6 +1257,8 @@
         function winGame() {
             document.getElementById('final-stats').innerText = "남은 하트: " + heartDisplay.innerText;
             globalScoreCode = generateHashCode();
+            document.getElementById('user-info-display').innerText = "성명: " + userName + " / 부서: " + userDept;
+            document.getElementById('cert-code-display').innerText = "증빙 코드: " + globalScoreCode;
             winScreen.classList.remove('hidden');
         }
         function loseGame() { loseScreen.classList.remove('hidden'); }
@@ -1265,7 +1273,14 @@
             body += "Do the Right Things!\r\n\r\n";
             body += "==============================\r\n";
             body += "증빙 코드 : " + globalScoreCode;
-            window.location.href = "mailto:" + recipient + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+
+            const mailtoUrl = "mailto:" + recipient + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+            const link = document.createElement('a');
+            link.href = mailtoUrl;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
